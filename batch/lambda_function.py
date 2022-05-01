@@ -69,8 +69,9 @@ def lambda_handler(event, context):
     obj = s3.Object(bucket, key)
     ids = json.loads(obj.get()['Body'].read())
 
+
     def judge_output_dbd_official(status):
-        return status.created_at <= datetime.utcnow() - timedelta(hours=12) and \
+        return status.created_at >= datetime.utcnow() - timedelta(hours=12) and \
             bool(list(filter(lambda x: x in status.full_text, [
                 'シュライン・オブ・シークレット',
                 '引き換えコード',
@@ -86,7 +87,7 @@ def lambda_handler(event, context):
     ))
 
     def judge_output_ruby_nea(status):
-        return status.created_at <= datetime.utcnow() - timedelta(hours=12) and \
+        return status.created_at >= datetime.utcnow() - timedelta(hours=12) and \
             bool(list(filter(lambda x: x in status.full_text, [
                 '引き換えコード',
                 'コード',
