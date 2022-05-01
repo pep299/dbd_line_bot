@@ -69,7 +69,7 @@ def lambda_handler(event, context):
     obj = s3.Object(bucket, key)
     ids = json.loads(obj.get()['Body'].read())
 
-    def judge_output(status):
+    def judge_output_dbd_official(status):
         return status.created_at <= datetime.utcnow() - timedelta(hours=12) and \
             bool(list(filter(lambda x: x in status.full_text, [
                 'シュライン・オブ・シークレット',
@@ -82,7 +82,18 @@ def lambda_handler(event, context):
             ])))
 
     push_list = list(filter(
-        judge_output, twitter_api.user_timeline(id='DeadbyBHVR_JP', tweet_mode='extended')
+        judge_output_dbd_official, twitter_api.user_timeline(id='DeadbyBHVR_JP', tweet_mode='extended', include_rts=False)
+    ))
+
+    def judge_output_ruby_nea(status):
+        return status.created_at <= datetime.utcnow() - timedelta(hours=12) and \
+            bool(list(filter(lambda x: x in status.full_text, [
+                '引き換えコード',
+                'コード',
+            ])))
+
+    push_list += list(filter(
+        judge_output_ruby_nea, twitter_api.user_timeline(id='Ruby_Nea_', tweet_mode='extended', include_rts=False)
     ))
 
     for status in push_list:
