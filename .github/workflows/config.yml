@@ -4,8 +4,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '*.md'
+      - 'drawio'
   pull_request:
-
+    paths-ignore:
+      - '*.md'
+      - 'drawio'
 jobs:
   aws_cdk:
     runs-on: ubuntu-latest
