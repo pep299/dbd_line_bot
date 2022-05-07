@@ -67,7 +67,8 @@ def lambda_handler(event, context):
                   "body": "Error"}
 
     obj = s3.Object(bucket, key)
-    ids = json.loads(obj.get()['Body'].read())
+    # ids = json.loads(obj.get()['Body'].read())
+    ids = ['Ce885c720735a2d1f60c22a7bb04104fb']
 
 
     def judge_output_dbd_official(status):
@@ -97,23 +98,23 @@ def lambda_handler(event, context):
         judge_output_ruby_nea, twitter_api.user_timeline(id='Ruby_Nea_', tweet_mode='extended', include_rts=False)
     ))
 
-    # for status in push_list:
-    #     messages = []
-    #     messages.append(TextSendMessage(text=status.full_text))
-    #     if bool(status.entities.get('media')):
-    #         messages.append(
-    #             ImageSendMessage(
-    #                 original_content_url=status.entities['media'][0]['media_url_https'],
-    #                 preview_image_url=status.entities['media'][0]['media_url_https'],
-    #             )
-    #         )
-    #     try:
-    #         for sender_id in ids:
-    #             line_bot_api.push_message(sender_id, messages=messages)
-    #     except LineBotApiError as e:
-    #         logger.error("Got exception from LINE Messaging API: %s\n" % e.message)
-    #         for m in e.error.details:
-    #             logger.error("  %s: %s" % (m.property, m.message))
-    #         return error_json
+    for status in push_list:
+        messages = []
+        messages.append(TextSendMessage(text=status.full_text))
+        if bool(status.entities.get('media')):
+            messages.append(
+                ImageSendMessage(
+                    original_content_url=status.entities['media'][0]['media_url_https'],
+                    preview_image_url=status.entities['media'][0]['media_url_https'],
+                )
+            )
+        try:
+            for sender_id in ids:
+                line_bot_api.push_message(sender_id, messages=messages)
+        except LineBotApiError as e:
+            logger.error("Got exception from LINE Messaging API: %s\n" % e.message)
+            for m in e.error.details:
+                logger.error("  %s: %s" % (m.property, m.message))
+            return error_json
 
     return ok_json
