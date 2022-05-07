@@ -1,17 +1,21 @@
 import { Stack, StackProps, Duration } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { Function, Code, Runtime,  } from 'aws-cdk-lib/aws-lambda';
+import { Function, Code, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const iamRoleForBatch = new Role(this, 'IamRoleForBatch', {
-      roleName: 'batch-lambda-role',
+    const iamRoleForLambda = new Role(this, 'IamRoleForLambda', {
+      roleName: 'lambda-role',
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
-        ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+        ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
       ],
     });
 
@@ -33,8 +37,26 @@ export class CdkStack extends Stack {
         TWITTER_CONSUMER_KEY: '',
         TWITTER_CONSUMER_SECRET: '',
       },
-      role: iamRoleForBatch,
+      role: iamRoleForLambda,
       timeout: Duration.minutes(5),
+      logRetention: RetentionDays.TWO_MONTHS,
     });
+
+    const batchInvoke = new Rule(this, 'DBDBotRule', {
+      // cron: 毎日9:30, 21:30(JST) rule: 30 0,12 * * ? *
+      schedule: Schedule.cron({
+        minute: '30',
+        hour: '0,12',
+        day: '*',
+        month: '*',
+        year: '*',
+      }),
+      targets: [
+        new LambdaFunction(batchStack),
+      ],
+    });
+
+    const lineIdBucket = Bucket.fromBucketName(this, 'line-ids', 'line-ids');
+    lineIdBucket.grantReadWrite(batchStack);
   }
 }
