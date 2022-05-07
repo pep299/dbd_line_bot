@@ -16,23 +16,23 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # LINE botの設定
-# channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-# if channel_access_token is None:
-#     logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-#     sys.exit(1)
+channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
+if channel_access_token is None:
+    logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
+    sys.exit(1)
 
-# line_bot_api = LineBotApi(channel_access_token)
+line_bot_api = LineBotApi(channel_access_token)
 
 # s3の設定
-# s3 = boto3.resource("s3")
-# bucket = os.getenv('S3_BUCKET_NAME', None)
-# key = os.getenv('S3_KEY_NAME', None)
-# if bucket is None:
-#     logger.error('Specify S3_BUCKET_NAME as environment variable.')
-#     sys.exit(1)
-# if key is None:
-#     logger.error('Specify S3_KEY_NAME as environment variable.')
-#     sys.exit(1)
+s3 = boto3.resource("s3")
+bucket = os.getenv('S3_BUCKET_NAME', None)
+key = os.getenv('S3_KEY_NAME', None)
+if bucket is None:
+    logger.error('Specify S3_BUCKET_NAME as environment variable.')
+    sys.exit(1)
+if key is None:
+    logger.error('Specify S3_KEY_NAME as environment variable.')
+    sys.exit(1)
 
 # Twitter APIの設定
 TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY', None)
@@ -66,8 +66,8 @@ def lambda_handler(event, context):
                   "headers": {},
                   "body": "Error"}
 
-    # obj = s3.Object(bucket, key)
-    # ids = json.loads(obj.get()['Body'].read())
+    obj = s3.Object(bucket, key)
+    ids = json.loads(obj.get()['Body'].read())
 
 
     def judge_output_dbd_official(status):
