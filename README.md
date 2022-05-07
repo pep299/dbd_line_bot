@@ -1,5 +1,5 @@
 # dbd_line_bot
-Dbd official tweet to LINE Talk room and Group by LINE Bot + Twitter API + AWS
+Dbd official tweet to LINE Talk room and Group by LINE Bot + Twitter API + AWS1
 
 ## architecture
 ![architecture](./drawio/architecture.drawio.svg)
