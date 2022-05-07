@@ -67,9 +67,7 @@ def lambda_handler(event, context):
                   "body": "Error"}
 
     obj = s3.Object(bucket, key)
-    # ids = json.loads(obj.get()['Body'].read())
-    ids = ['Ce885c720735a2d1f60c22a7bb04104fb']
-
+    ids = json.loads(obj.get()['Body'].read())
 
     def judge_output_dbd_official(status):
         return status.created_at >= datetime.utcnow() - timedelta(hours=12) and \
