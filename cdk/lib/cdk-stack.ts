@@ -86,5 +86,6 @@ export class CdkStack extends Stack {
 
     const lineIdBucket = Bucket.fromBucketName(this, 'line-ids', 'line-ids');
     lineIdBucket.grantReadWrite(batchStack);
+    lineIdBucket.grantReadWrite(webhookHandlerStack);
   }
 }
