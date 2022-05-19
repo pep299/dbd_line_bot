@@ -35,9 +35,17 @@ export class CdkStack extends Stack {
         bundling: {
           image: Runtime.PYTHON_3_9.bundlingImage,
           command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
+            'bash',
+            '-c',
+            [
+              'curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python',
+              'source $HOME/.poetry/env',
+              'poetry export -f requirements.txt --output /asset-output/requirements.txt',
+              'pip install -r /asset-output/requirements.txt -t /asset-output',
+              'cp -au . /asset-output'
+            ].join(' && '),
           ],
+          user: 'root',
         },
       }),
       runtime: Runtime.PYTHON_3_9,
@@ -57,9 +65,17 @@ export class CdkStack extends Stack {
         bundling: {
           image: Runtime.PYTHON_3_9.bundlingImage,
           command: [
-            'bash', '-c',
-            'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output',
+            'bash',
+            '-c',
+            [
+              'curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python',
+              'source $HOME/.poetry/env',
+              'poetry export -f requirements.txt --output /asset-output/requirements.txt',
+              'pip install -r /asset-output/requirements.txt -t /asset-output',
+              'cp -au . /asset-output'
+            ].join(' && '),
           ],
+          user: 'root',
         },
       }),
       runtime: Runtime.PYTHON_3_9,
