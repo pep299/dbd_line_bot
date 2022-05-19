@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage, ImageSendMessage
@@ -70,7 +70,7 @@ def lambda_handler(event, context):
     ids = json.loads(obj.get()['Body'].read())
 
     def judge_output_dbd_official(status):
-        return status.created_at >= datetime.utcnow() - timedelta(hours=12) and \
+        return status.created_at >= datetime.now(timezone.utc) - timedelta(hours=12) and \
             bool(list(filter(lambda x: x in status.full_text, [
                 'シュライン・オブ・シークレット',
                 '引き換えコード',
@@ -82,18 +82,18 @@ def lambda_handler(event, context):
             ])))
 
     push_list = list(filter(
-        judge_output_dbd_official, twitter_api.user_timeline(id='DeadbyBHVR_JP', tweet_mode='extended', include_rts=False)
+        judge_output_dbd_official, twitter_api.user_timeline(user_id='DeadbyBHVR_JP', tweet_mode='extended', include_rts=False)
     ))
 
     def judge_output_ruby_nea(status):
-        return status.created_at >= datetime.utcnow() - timedelta(hours=12) and \
+        return status.created_at >= datetime.now(timezone.utc) - timedelta(hours=12) and \
             bool(list(filter(lambda x: x in status.full_text, [
                 '引き換えコード',
                 'コード',
             ])))
 
     push_list += list(filter(
-        judge_output_ruby_nea, twitter_api.user_timeline(id='Ruby_Nea_', tweet_mode='extended', include_rts=False)
+        judge_output_ruby_nea, twitter_api.user_timeline(user_id='Ruby_Nea_', tweet_mode='extended', include_rts=False)
     ))
 
     for status in push_list:
