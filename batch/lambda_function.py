@@ -82,7 +82,7 @@ def lambda_handler(event, context):
             ])))
 
     push_list = list(filter(
-        judge_output_dbd_official, twitter_api.user_timeline(user_id='DeadbyBHVR_JP', tweet_mode='extended', include_rts=False)
+        judge_output_dbd_official, twitter_api.user_timeline(screen_name='DeadbyBHVR_JP', tweet_mode='extended', exclude_replies=True, include_rts=False)
     ))
 
     def judge_output_ruby_nea(status):
@@ -93,7 +93,7 @@ def lambda_handler(event, context):
             ])))
 
     push_list += list(filter(
-        judge_output_ruby_nea, twitter_api.user_timeline(user_id='Ruby_Nea_', tweet_mode='extended', include_rts=False)
+        judge_output_ruby_nea, twitter_api.user_timeline(screen_name='Ruby_Nea_', tweet_mode='extended', exclude_replies=True, include_rts=False)
     ))
 
     for status in push_list:
