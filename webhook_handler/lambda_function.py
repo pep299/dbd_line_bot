@@ -95,7 +95,7 @@ def lambda_handler(event, context):
 @handler.add(MessageEvent, message=TextMessage)
 def message(event):
     if event.message.text == '今週の聖堂':
-        status_list = twitter_api.user_timeline(user_id='DeadbyBHVR_JP', tweet_mode='extended', exclude_replies=True, include_rts=False)
+        status_list = twitter_api.user_timeline(user_id='DeadbyBHVR_JP', tweet_mode='extended', include_rts=False)
         output_list = list(filter(lambda x: 'シュライン・オブ・シークレット' in x.full_text, status_list))
 
         if not output_list:
