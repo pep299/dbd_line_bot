@@ -12,7 +12,7 @@ on:
       - '*.md'
       - 'drawio'
 jobs:
-  batch_test:
+  test:
     runs-on: ubuntu-latest
     defaults:
       run:
