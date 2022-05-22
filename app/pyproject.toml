@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "batch"
+name = "dbd_bot"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["pep299"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

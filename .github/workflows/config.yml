@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: batch
+        working-directory: app
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -41,6 +41,18 @@ jobs:
     defaults:
       run:
         working-directory: cdk
+    env:
+      AWS_DEFAULT_REGION: 'us-east-2'
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+      LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      S3_KEY_NAME: ${{ secrets.S3_KEY_NAME }}
+      TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+      TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+      TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -59,31 +71,7 @@ jobs:
       - name: CDK diff check
         if: contains(github.event_name, 'pull_request')
         run: npm run cdk:diff
-        env:
-          AWS_DEFAULT_REGION: 'us-east-2'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-          S3_KEY_NAME: ${{ secrets.S3_KEY_NAME }}
-          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-          TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-          TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
 
       - name: CDK deploy
         if: contains(github.event_name, 'push')
         run: npm run cdk:deploy
-        env:
-          AWS_DEFAULT_REGION: 'us-east-2'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-          S3_KEY_NAME: ${{ secrets.S3_KEY_NAME }}
-          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-          TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-          TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
