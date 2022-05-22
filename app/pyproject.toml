@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "webhook_handler"
+name = "dbd_bot"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["pep299"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -11,6 +11,7 @@ line-bot-sdk = "^2.2.1"
 tweepy = "^4.9.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
