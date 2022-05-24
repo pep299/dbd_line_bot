@@ -1,5 +1,3 @@
-import os
-import sys
 import logging
 import json
 from datetime import datetime, timedelta, timezone
@@ -11,49 +9,24 @@ from linebot.exceptions import LineBotApiError
 import boto3
 import tweepy
 
+from env import Env
+
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# LINE botの設定
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-if channel_access_token is None:
-    logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
+# env取得
+env = Env()
 
-line_bot_api = LineBotApi(channel_access_token)
+# LINE botの設定
+line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
 
 # s3の設定
 s3 = boto3.resource("s3")
-bucket = os.getenv('S3_BUCKET_NAME', None)
-key = os.getenv('S3_KEY_NAME', None)
-if bucket is None:
-    logger.error('Specify S3_BUCKET_NAME as environment variable.')
-    sys.exit(1)
-if key is None:
-    logger.error('Specify S3_KEY_NAME as environment variable.')
-    sys.exit(1)
 
 # Twitter APIの設定
-TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY', None)
-TWITTER_CONSUMER_SECRET = os.getenv('TWITTER_CONSUMER_SECRET', None)
-TWITTER_ACCESS_TOKEN = os.getenv('TWITTER_ACCESS_TOKEN', None)
-TWITTER_ACCESS_TOKEN_SECRET = os.getenv('TWITTER_ACCESS_TOKEN_SECRET', None)
-if TWITTER_CONSUMER_KEY is None:
-    logger.error('Specify TWITTER_CONSUMER_KEY as environment variable.')
-    sys.exit(1)
-if TWITTER_CONSUMER_SECRET is None:
-    logger.error('Specify TWITTER_CONSUMER_SECRET as environment variable.')
-    sys.exit(1)
-if TWITTER_ACCESS_TOKEN is None:
-    logger.error('Specify TWITTER_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
-if TWITTER_ACCESS_TOKEN_SECRET is None:
-    logger.error('Specify TWITTER_ACCESS_TOKEN_SECRET as environment variable.')
-    sys.exit(1)
-
-auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
-auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
+auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
+auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
 twitter_api = tweepy.API(auth)
 
 def lambda_handler(event, context):
@@ -66,7 +39,7 @@ def lambda_handler(event, context):
                   "headers": {},
                   "body": "Error"}
 
-    obj = s3.Object(bucket, key)
+    obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
     ids = json.loads(obj.get()['Body'].read())
 
     def judge_output_dbd_official(status):
