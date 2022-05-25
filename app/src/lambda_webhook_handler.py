@@ -103,13 +103,6 @@ def message(event):
 
         messages = []
         messages.append(TextSendMessage(text=output_list[0].full_text))
-        if bool(output_list[0].entities.get('media')):
-            messages.append(
-                ImageSendMessage(
-                    original_content_url=output_list[0].entities['media'][0]['media_url_https'],
-                    preview_image_url=output_list[0].entities['media'][0]['media_url_https'],
-                )
-            )
 
         line_bot_api.reply_message(event.reply_token, messages=messages)
 
