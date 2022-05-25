@@ -2,6 +2,11 @@ import os
 import sys
 import logging
 
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
+
+IS_PROD = os.getenv('ENV_NAME') is 'prod'
+
 class Env:
     def __init__(
         self,
@@ -24,56 +29,20 @@ class Env:
         self.TWITTER_ACCESS_TOKEN_SECRET = TWITTER_ACCESS_TOKEN_SECRET
 
 def get_env() -> Env:
-    logger = logging.getLogger()
-    logger.setLevel(logging.ERROR)
-
-    LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET', None)
-    if LINE_CHANNEL_SECRET is None:
-        logger.error('Specify LINE_CHANNEL_SECRET as environment variable.')
-        sys.exit(1)
-
-    LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-    if LINE_CHANNEL_ACCESS_TOKEN is None:
-        logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-        sys.exit(1)
-
-    S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME', None)
-    if S3_BUCKET_NAME is None:
-        logger.error('Specify S3_BUCKET_NAME as environment variable.')
-        sys.exit(1)
-
-    S3_KEY_NAME = os.getenv('S3_KEY_NAME', None)
-    if S3_KEY_NAME is None:
-        logger.error('Specify S3_KEY_NAME as environment variable.')
-        sys.exit(1)
-
-    TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY', None)
-    if TWITTER_CONSUMER_KEY is None:
-        logger.error('Specify TWITTER_CONSUMER_KEY as environment variable.')
-        sys.exit(1)
-
-    TWITTER_CONSUMER_SECRET = os.getenv('TWITTER_CONSUMER_SECRET', None)
-    if TWITTER_CONSUMER_SECRET is None:
-        logger.error('Specify TWITTER_CONSUMER_SECRET as environment variable.')
-        sys.exit(1)
-
-    TWITTER_ACCESS_TOKEN = os.getenv('TWITTER_ACCESS_TOKEN', None)
-    if TWITTER_ACCESS_TOKEN is None:
-        logger.error('Specify TWITTER_ACCESS_TOKEN as environment variable.')
-        sys.exit(1)
-
-    TWITTER_ACCESS_TOKEN_SECRET = os.getenv('TWITTER_ACCESS_TOKEN_SECRET', None)
-    if TWITTER_ACCESS_TOKEN_SECRET is None:
-        logger.error('Specify TWITTER_ACCESS_TOKEN_SECRET as environment variable.')
-        sys.exit(1)
-
     return Env(
-        LINE_CHANNEL_SECRET,
-        LINE_CHANNEL_ACCESS_TOKEN,
-        S3_BUCKET_NAME,
-        S3_KEY_NAME,
-        TWITTER_CONSUMER_KEY,
-        TWITTER_CONSUMER_SECRET,
-        TWITTER_ACCESS_TOKEN,
-        TWITTER_ACCESS_TOKEN_SECRET,
+        LINE_CHANNEL_SECRET = get_env_by_key('LINE_CHANNEL_SECRET'),
+        LINE_CHANNEL_ACCESS_TOKEN = get_env_by_key('LINE_CHANNEL_ACCESS_TOKEN'),
+        S3_BUCKET_NAME = get_env_by_key('S3_BUCKET_NAME'),
+        S3_KEY_NAME = get_env_by_key('S3_KEY_NAME'),
+        TWITTER_CONSUMER_KEY = get_env_by_key('TWITTER_CONSUMER_KEY'),
+        TWITTER_CONSUMER_SECRET = get_env_by_key('TWITTER_CONSUMER_SECRET'),
+        TWITTER_ACCESS_TOKEN = get_env_by_key('TWITTER_ACCESS_TOKEN'),
+        TWITTER_ACCESS_TOKEN_SECRET = get_env_by_key('TWITTER_ACCESS_TOKEN_SECRET'),
     )
+
+def get_env_by_key(key: str) -> str:
+    value = os.getenv(key, None)
+    if value is None:
+        logger.error(f'Specify {key} as environment variable.')
+        sys.exit(1)
+    return value

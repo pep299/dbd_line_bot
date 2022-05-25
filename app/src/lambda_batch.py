@@ -1,7 +1,7 @@
 import logging
 import json
 from datetime import datetime, timedelta, timezone
-from app.src.env import get_env
+from app.src.env import get_env, IS_PROD
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage, ImageSendMessage
@@ -10,25 +10,31 @@ from linebot.exceptions import LineBotApiError
 import boto3
 import tweepy
 
-from env import Env
+# global変数
+logger = None
+env = None
+line_bot_api = None
+s3 = None
+twitter_api = None
 
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# env取得
-env = get_env()
+if IS_PROD:
+    # env取得
+    env = get_env()
 
-# LINE botの設定
-line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
+    # LINE botの設定
+    line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
 
-# s3の設定
-s3 = boto3.resource("s3")
+    # s3の設定
+    s3 = boto3.resource("s3")
 
-# Twitter APIの設定
-auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
-auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
-twitter_api = tweepy.API(auth)
+    # Twitter APIの設定
+    auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
+    auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
+    twitter_api = tweepy.API(auth)
 
 def lambda_handler(event, context):
     ok_json = {"isBase64Encoded": False,
