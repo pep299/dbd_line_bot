@@ -5,7 +5,8 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
-IS_PROD = os.getenv('ENV_NAME') is 'prod'
+IS_PROD = os.getenv('ENV_NAME') == 'prod'
+IS_DEV = os.getenv('ENV_NAME') == 'dev'
 
 class Env:
     def __init__(

@@ -1,14 +1,15 @@
 import logging
 import json
 from datetime import datetime, timedelta, timezone
-from app.src.env import get_env, IS_PROD
+from env import get_env, IS_PROD, IS_DEV
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage, ImageSendMessage
 from linebot.exceptions import LineBotApiError
 
 import boto3
-import tweepy
+from tweepy import OAuthHandler, API
+from tweepy.models import Status
 
 # global変数
 logger = None
@@ -21,7 +22,7 @@ twitter_api = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-if IS_PROD:
+if IS_PROD or IS_DEV:
     # env取得
     env = get_env()
 
@@ -32,60 +33,76 @@ if IS_PROD:
     s3 = boto3.resource("s3")
 
     # Twitter APIの設定
-    auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
+    auth = OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
     auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
-    twitter_api = tweepy.API(auth)
+    twitter_api = API(auth)
 
 def lambda_handler(event, context):
-    ok_json = {"isBase64Encoded": False,
-               "statusCode": 200,
-               "headers": {},
-               "body": ""}
-    error_json = {"isBase64Encoded": False,
-                  "statusCode": 500,
-                  "headers": {},
-                  "body": "Error"}
+    ok_json = {
+        "isBase64Encoded": False,
+        "statusCode": 200,
+        "headers": {},
+        "body": ""
+    }
+    error_json = {
+        "isBase64Encoded": False,
+        "statusCode": 500,
+        "headers": {},
+        "body": "Error"
+    }
+    sender_ids = get_sender_ids(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
 
-    obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
-    ids = json.loads(obj.get()['Body'].read())
+    push_list = get_send_message_by_dbd_official()
+    push_list += get_send_message_by_ruby_nea()
 
-    def judge_output_dbd_official(status):
-        return status.created_at >= datetime.now(timezone.utc) - timedelta(hours=12) and \
-            bool(list(filter(lambda x: x in status.full_text, [
-                'シュライン・オブ・シークレット',
-                '引き換えコード',
-                'BP',
-                'ブラッドポイント',
-                'インデスントシャード',
-                'シャード',
-                'アップデート'
-            ])))
+    return ok_json if send_message(push_list, sender_ids) else error_json
 
-    push_list = list(filter(
-        judge_output_dbd_official, twitter_api.user_timeline(screen_name='DeadbyBHVR_JP', count=20, tweet_mode='extended', exclude_replies=True, include_rts=False)
-    ))
-
-    def judge_output_ruby_nea(status):
-        return status.created_at >= datetime.now(timezone.utc) - timedelta(hours=12) and \
-            bool(list(filter(lambda x: x in status.full_text, [
-                '引き換えコード',
-                'コード',
-            ])))
-
-    push_list += list(filter(
-        judge_output_ruby_nea, twitter_api.user_timeline(screen_name='Ruby_Nea_', count=20, tweet_mode='extended', exclude_replies=True, include_rts=False)
-    ))
-
+def send_message(push_list: list[Status], sender_ids: list[str]) -> bool:
+    raise_error = False
     for status in push_list:
         messages = []
         messages.append(TextSendMessage(text=status.full_text))
-        try:
-            for sender_id in ids:
+        for sender_id in sender_ids:
+            try:
                 line_bot_api.push_message(sender_id, messages=messages)
-        except LineBotApiError as e:
-            logger.error("Got exception from LINE Messaging API: %s\n" % e.message)
-            for m in e.error.details:
-                logger.error("  %s: %s" % (m.property, m.message))
-            return error_json
+            except LineBotApiError as e:
+                logger.error("Got exception from LINE Messaging API: %s\n" % e.message)
+                for m in e.error.details:
+                    logger.error("  %s: %s" % (m.property, m.message))
+                raise_error = True
 
-    return ok_json
+    return not raise_error
+
+def get_sender_ids(bucket :str, key: str) -> list[str]:
+    obj = s3.Object(bucket, key)
+    return json.loads(obj.get()['Body'].read())
+
+def get_send_message_by_dbd_official() -> list[Status]:
+    SCREEN_NAME = 'DeadbyBHVR_JP'
+    OUTPUT_FILTER = [
+        'シュライン・オブ・シークレット',
+        '引き換えコード',
+        'BP',
+        'ブラッドポイント',
+        'インデスントシャード',
+        'シャード',
+        'アップデート'
+    ]
+    statuses = get_statuses(SCREEN_NAME)
+    return [status for status in statuses if judge_output_status(status, OUTPUT_FILTER)]
+
+def get_send_message_by_ruby_nea() -> list[Status]:
+    SCREEN_NAME = 'Ruby_Nea_'
+    OUTPUT_FILTER = [
+        '引き換えコード',
+        'コード',
+    ]
+    statuses = get_statuses(SCREEN_NAME)
+    return [status for status in statuses if judge_output_status(status, OUTPUT_FILTER)]
+
+def get_statuses(screen_name: str) -> list[Status]:
+    return twitter_api.user_timeline(screen_name=screen_name, count=20, tweet_mode='extended', exclude_replies=True, include_rts=False)
+
+def judge_output_status(status: Status, filter_list: list) -> bool:
+    return status.created_at >= datetime.now(timezone.utc) - timedelta(hours=12) and \
+            bool(list(filter(lambda x: x in status.full_text, filter_list)))

@@ -1,6 +1,6 @@
 import logging
 import json
-from app.src.env import IS_PROD, get_env
+from env import IS_PROD, IS_DEV, get_env
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -26,7 +26,7 @@ twitter_api = None
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-if IS_PROD:
+if IS_PROD or IS_DEV:
     # env取得
     env = get_env()
 
@@ -48,14 +48,18 @@ def lambda_handler(event, context):
     elif "X-Line-Signature" in event["headers"]:
         signature = event["headers"]["X-Line-Signature"]
     body = event["body"]
-    ok_json = {"isBase64Encoded": False,
-               "statusCode": 200,
-               "headers": {},
-               "body": ""}
-    error_json = {"isBase64Encoded": False,
-                  "statusCode": 500,
-                  "headers": {},
-                  "body": "Error"}
+    ok_json = {
+        "isBase64Encoded": False,
+        "statusCode": 200,
+        "headers": {},
+        "body": ""
+    }
+    error_json = {
+        "isBase64Encoded": False,
+        "statusCode": 500,
+        "headers": {},
+        "body": "Error"
+    }
 
     try:
         handler.handle(body, signature)
