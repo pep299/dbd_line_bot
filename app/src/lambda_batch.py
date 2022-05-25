@@ -79,13 +79,6 @@ def lambda_handler(event, context):
     for status in push_list:
         messages = []
         messages.append(TextSendMessage(text=status.full_text))
-        if bool(status.entities.get('media')):
-            messages.append(
-                ImageSendMessage(
-                    original_content_url=status.entities['media'][0]['media_url_https'],
-                    preview_image_url=status.entities['media'][0]['media_url_https'],
-                )
-            )
         try:
             for sender_id in ids:
                 line_bot_api.push_message(sender_id, messages=messages)
