@@ -1,5 +1,6 @@
 import logging
 import json
+from app.src.env import get_env
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -20,7 +21,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # env取得
-env = Env()
+env = get_env()
 
 # LINE botの設定
 line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)

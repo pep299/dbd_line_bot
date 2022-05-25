@@ -1,6 +1,7 @@
 import logging
 import json
 from datetime import datetime, timedelta, timezone
+from app.src.env import get_env
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage, ImageSendMessage
@@ -16,7 +17,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # env取得
-env = Env()
+env = get_env()
 
 # LINE botの設定
 line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
