@@ -42,6 +42,11 @@ if IS_PROD or IS_DEV:
     auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
     twitter_api = tweepy.API(auth)
 
+if IS_TEST:
+    env = get_env()
+    # LINE botの設定
+    handler = WebhookHandler(env.LINE_CHANNEL_SECRET) # @handler.addがテストスクリプト前に実行されるため定義
+
 def lambda_handler(event, context):
     if "x-line-signature" in event["headers"]:
         signature = event["headers"]["x-line-signature"]
