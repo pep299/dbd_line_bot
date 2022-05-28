@@ -22,6 +22,7 @@ export class CdkStack extends Stack {
     });
 
     const lambdaEnv = {
+      ENV_NAME: 'prod',
       LINE_CHANNEL_SECRET: process.env.LINE_CHANNEL_SECRET!!,
       LINE_CHANNEL_ACCESS_TOKEN: process.env.LINE_CHANNEL_ACCESS_TOKEN!!,
       S3_BUCKET_NAME: process.env.S3_BUCKET_NAME!!,

@@ -1,13 +1,12 @@
-import os
-import sys
 import logging
 import json
+from app.src.env import IS_PROD, IS_DEV, get_env
 
 from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.models import (
-    MessageEvent, JoinEvent, LeaveEvent, TextMessage, TextSendMessage, ImageSendMessage
+    MessageEvent, JoinEvent, LeaveEvent, TextMessage, TextSendMessage
 )
 from linebot.exceptions import (
     LineBotApiError, InvalidSignatureError
@@ -15,55 +14,33 @@ from linebot.exceptions import (
 import boto3
 import tweepy
 
+# global変数
+logger = None
+env = None
+line_bot_api = None
+handler = None
+s3 = None
+twitter_api = None
+
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# LINE botの設定
-channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-if channel_secret is None:
-    logger.error('Specify LINE_CHANNEL_SECRET as environment variable.')
-    sys.exit(1)
-if channel_access_token is None:
-    logger.error('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
+if IS_PROD or IS_DEV:
+    # env取得
+    env = get_env()
 
-line_bot_api = LineBotApi(channel_access_token)
-handler = WebhookHandler(channel_secret)
+    # LINE botの設定
+    line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
+    handler = WebhookHandler(env.LINE_CHANNEL_SECRET)
 
-# s3の設定
-s3 = boto3.resource("s3")
-bucket = os.getenv('S3_BUCKET_NAME', None)
-key = os.getenv('S3_KEY_NAME', None)
-if bucket is None:
-    logger.error('Specify S3_BUCKET_NAME as environment variable.')
-    sys.exit(1)
-if key is None:
-    logger.error('Specify S3_KEY_NAME as environment variable.')
-    sys.exit(1)
+    # s3の設定
+    s3 = boto3.resource("s3")
 
-# Twitter APIの設定
-TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY', None)
-TWITTER_CONSUMER_SECRET = os.getenv('TWITTER_CONSUMER_SECRET', None)
-TWITTER_ACCESS_TOKEN = os.getenv('TWITTER_ACCESS_TOKEN', None)
-TWITTER_ACCESS_TOKEN_SECRET = os.getenv('TWITTER_ACCESS_TOKEN_SECRET', None)
-if TWITTER_CONSUMER_KEY is None:
-    logger.error('Specify TWITTER_CONSUMER_KEY as environment variable.')
-    sys.exit(1)
-if TWITTER_CONSUMER_SECRET is None:
-    logger.error('Specify TWITTER_CONSUMER_SECRET as environment variable.')
-    sys.exit(1)
-if TWITTER_ACCESS_TOKEN is None:
-    logger.error('Specify TWITTER_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
-if TWITTER_ACCESS_TOKEN_SECRET is None:
-    logger.error('Specify TWITTER_ACCESS_TOKEN_SECRET as environment variable.')
-    sys.exit(1)
-
-auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
-auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
-twitter_api = tweepy.API(auth)
+    # Twitter APIの設定
+    auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
+    auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
+    twitter_api = tweepy.API(auth)
 
 def lambda_handler(event, context):
     if "x-line-signature" in event["headers"]:
@@ -71,14 +48,18 @@ def lambda_handler(event, context):
     elif "X-Line-Signature" in event["headers"]:
         signature = event["headers"]["X-Line-Signature"]
     body = event["body"]
-    ok_json = {"isBase64Encoded": False,
-               "statusCode": 200,
-               "headers": {},
-               "body": ""}
-    error_json = {"isBase64Encoded": False,
-                  "statusCode": 500,
-                  "headers": {},
-                  "body": "Error"}
+    ok_json = {
+        "isBase64Encoded": False,
+        "statusCode": 200,
+        "headers": {},
+        "body": ""
+    }
+    error_json = {
+        "isBase64Encoded": False,
+        "statusCode": 500,
+        "headers": {},
+        "body": "Error"
+    }
 
     try:
         handler.handle(body, signature)
@@ -109,7 +90,7 @@ def message(event):
 @handler.add(JoinEvent)
 def store_id(event):
     logger.info('参加先id: ' + event.source.sender_id)
-    obj = s3.Object(bucket, key)
+    obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
     ids = json.loads(obj.get()['Body'].read())
     if (event.source.sender_id in ids):
         logger.info('id重複のため書き込まない')
@@ -121,7 +102,7 @@ def store_id(event):
 @handler.add(LeaveEvent)
 def delete_id(event):
     logger.info('退室先id: '+ event.source.sender_id)
-    obj = s3.Object(bucket, key)
+    obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
     ids = json.loads(obj.get()['Body'].read())
     if (event.source.sender_id in ids):
         new_ids = list(filter(lambda x: not x == event.source.sender_id, ids))
