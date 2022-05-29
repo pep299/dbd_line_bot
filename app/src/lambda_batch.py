@@ -1,7 +1,7 @@
 import logging
 import json
 from datetime import datetime, timedelta, timezone
-from app.src.env import get_env, IS_PROD, IS_DEV
+from .env import get_env, IS_PROD, IS_DEV
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
