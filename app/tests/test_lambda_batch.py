@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from logging import ERROR
 import pytest
 from pytest_mock import MockerFixture
@@ -12,7 +12,6 @@ from tweepy.models import Status
 from app.src.env import Env
 from app.src.lambda_batch import judge_output_status, lambda_handler, get_send_message_by_dbd_official, get_send_message_by_ruby_nea, send_message
 
-
 def setup_mock_s3(mocker: MockerFixture, content: str):
     s3 = boto3.resource("s3")
     bucket = s3.Bucket("test")
@@ -22,17 +21,22 @@ def setup_mock_s3(mocker: MockerFixture, content: str):
     mocker.patch("app.src.lambda_batch.s3", s3)
     mocker.patch("app.src.lambda_batch.env", Env(S3_BUCKET_NAME="test", S3_KEY_NAME="test"))
 
+def setup_mock_twitter_api(mocker: MockerFixture, send_message: str, created_at: str):
+    test_status = Status.parse(None, { 'full_text': send_message, 'created_at': created_at })
+    status_list = [test_status]
+    mocker.patch("app.src.lambda_batch.twitter_api", mocker.Mock())
+    mocker.patch("app.src.lambda_batch.twitter_api.user_timeline", return_value=status_list)
+
 @mock_s3
+@pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_lambda_handler(mocker: MockerFixture):
     setup_mock_s3(mocker, '["abcde"]')
 
     send_message = "引き換えコード: dummy"
+    created_at = 'Tue Feb 22 13:00:00 +0000 2022'
 
     # Twitterへのリクエストをmock
-    test_status = Status.parse(None, { 'full_text': send_message, 'created_at': (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%a %b %d %H:%M:%S %z %Y') })
-    status_list = [test_status]
-    mocker.patch("app.src.lambda_batch.twitter_api", mocker.Mock())
-    mocker.patch("app.src.lambda_batch.twitter_api.user_timeline", return_value=status_list)
+    setup_mock_twitter_api(mocker, send_message, created_at)
 
     # LINEへのリクエストをmock
     mocker.patch("app.src.lambda_batch.line_bot_api", mocker.Mock())
@@ -55,49 +59,49 @@ def test_line_bot_api_error(mocker: MockerFixture, caplog: LogCaptureFixture):
     assert ('root', ERROR, '  error: abcde') in caplog.record_tuples
     assert result == False
 
+@pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_no_get_dbd_official(mocker: MockerFixture):
     send_message = "dummy"
+    created_at = 'Tue Feb 22 13:00:00 +0000 2022'
 
     # Twitterへのリクエストをmock
-    test_status = Status.parse(None, { 'full_text': send_message, 'created_at': (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%a %b %d %H:%M:%S %z %Y') })
-    status_list = [test_status]
-    mocker.patch("app.src.lambda_batch.twitter_api", mocker.Mock())
-    mocker.patch("app.src.lambda_batch.twitter_api.user_timeline", return_value=status_list)
+    setup_mock_twitter_api(mocker, send_message, created_at)
 
     result = get_send_message_by_dbd_official()
 
     assert result == []
 
+@pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_no_get_ruby_nea(mocker: MockerFixture):
     send_message = "dummy"
+    created_at = 'Tue Feb 22 13:00:00 +0000 2022'
 
     # Twitterへのリクエストをmock
-    test_status = Status.parse(None, { 'full_text': send_message, 'created_at': (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%a %b %d %H:%M:%S %z %Y') })
-    status_list = [test_status]
-    mocker.patch("app.src.lambda_batch.twitter_api", mocker.Mock())
-    mocker.patch("app.src.lambda_batch.twitter_api.user_timeline", return_value=status_list)
+    setup_mock_twitter_api(mocker, send_message, created_at)
 
     result = get_send_message_by_ruby_nea()
 
     assert result == []
 
 @pytest.mark.parametrize("input,expected", [
-    (datetime(2022, 2, 22, 0, 59, 59, 999999, tzinfo=timezone.utc), False),
-    (datetime(2022, 2, 22, 1, 00, 00, 000000, tzinfo=timezone.utc), True),
+    ('Tue Feb 22 00:59:59 +0000 2022', False),
+    ('Tue Feb 22 01:00:00 +0000 2022', True),
 ])
 @pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_date_filter_judge_output_status(mocker: MockerFixture, input, expected):
     filters = ['test']
-    test_status = Status.parse(None, { 'full_text': 'test!', 'created_at': input.strftime('%a %b %d %H:%M:%S %z %Y') })
+    test_status = Status.parse(None, { 'full_text': 'test!', 'created_at': input })
 
     result = judge_output_status(test_status, filters)
+
     assert expected == result
 
 @pytest.mark.parametrize("filters,text,expected", [
     (['引き換えコード'], 'コード', False),
     (['コード'], '引き換えコード', True)
 ])
+@pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_str_filter_judge_output_status(filters, text, expected):
-    test_status = Status.parse(None, { 'full_text': text, 'created_at': datetime.now(timezone.utc).strftime('%a %b %d %H:%M:%S %z %Y') })
+    test_status = Status.parse(None, { 'full_text': text, 'created_at': 'Tue Feb 22 13:00:00 +0000 2022' })
     result = judge_output_status(test_status, filters)
     assert expected == result
