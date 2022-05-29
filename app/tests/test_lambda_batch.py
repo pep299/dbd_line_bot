@@ -1,12 +1,17 @@
 from datetime import datetime, timedelta, timezone
+from logging import ERROR
 import pytest
 from pytest_mock import MockerFixture
+from _pytest.logging import LogCaptureFixture
 import boto3
 from moto import mock_s3
 from linebot.models import TextSendMessage
+from linebot.models.error import Error, ErrorDetail
+from linebot.exceptions import LineBotApiError
 from tweepy.models import Status
 from app.src.env import Env
-from app.src.lambda_batch import judge_output_status, lambda_handler, get_send_message_by_dbd_official, get_send_message_by_ruby_nea
+from app.src.lambda_batch import judge_output_status, lambda_handler, get_send_message_by_dbd_official, get_send_message_by_ruby_nea, send_message
+
 
 def setup_mock_s3(mocker: MockerFixture, content: str):
     s3 = boto3.resource("s3")
@@ -38,6 +43,17 @@ def test_lambda_handler(mocker: MockerFixture):
     assert result['statusCode'] == 200
     assert mock_push_message.call_count == 2
     mock_push_message.assert_called_with("abcde", messages=[TextSendMessage(text=send_message)])
+
+def test_line_bot_api_error(mocker: MockerFixture, caplog: LogCaptureFixture):
+    push_list = [Status.parse(None, { 'full_text': '' })]
+    sender_ids = ['abcde']
+    mocker.patch("app.src.lambda_batch.line_bot_api", mocker.Mock())
+    mocker.patch("app.src.lambda_batch.line_bot_api.push_message", side_effect=\
+            LineBotApiError(400, {}, error=Error(message='invalid id', details=[ErrorDetail(property='error', message='abcde')])))
+    result = send_message(push_list, sender_ids)
+    assert ('root', ERROR, 'Got exception from LINE Messaging API: invalid id\n') in caplog.record_tuples
+    assert ('root', ERROR, '  error: abcde') in caplog.record_tuples
+    assert result == False
 
 def test_no_get_dbd_official(mocker: MockerFixture):
     send_message = "dummy"

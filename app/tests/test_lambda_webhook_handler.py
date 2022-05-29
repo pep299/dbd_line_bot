@@ -1,10 +1,12 @@
 import json
-from logging import INFO
+from logging import INFO, ERROR
 from pytest_mock import MockerFixture
 from _pytest.logging import LogCaptureFixture
 import boto3
 from moto import mock_s3
 from linebot.models import MessageEvent, JoinEvent, LeaveEvent, TextSendMessage
+from linebot.models.error import Error, ErrorDetail
+from linebot.exceptions import LineBotApiError, InvalidSignatureError
 from tweepy.models import Status
 from app.src.lambda_webhook_handler import message, lambda_handler, store_id, delete_id
 from app.src.env import Env
@@ -38,6 +40,32 @@ def test_lambda_handler_message(mocker: MockerFixture):
 
     assert result['statusCode'] == 200
     mock_reply_message.assert_called_once_with(reply_token, messages=[TextSendMessage(text=send_message)])
+
+def test_line_bot_api_error(mocker: MockerFixture, caplog: LogCaptureFixture):
+    event = {
+        "headers": {
+            "x-line-signature": "dummy"
+        },
+        "body": ''
+    }
+    mocker.patch("app.src.lambda_webhook_handler.handler.handle", side_effect=\
+            LineBotApiError(400, {}, error=Error(message='invalid id', details=[ErrorDetail(property='error', message='abcde')])))
+    result = lambda_handler(event, None)
+    assert ('root', ERROR, 'Got exception from LINE Messaging API: invalid id\n') in caplog.record_tuples
+    assert ('root', ERROR, '  error: abcde') in caplog.record_tuples
+    assert result['statusCode'] == 500
+
+def test_invalid_signature_error(mocker: MockerFixture, caplog: LogCaptureFixture):
+    event = {
+        "headers": {
+            "x-line-signature": "dummy"
+        },
+        "body": ''
+    }
+    mocker.patch("app.src.lambda_webhook_handler.handler.handle", side_effect=InvalidSignatureError)
+    result = lambda_handler(event, None)
+    assert ('root', ERROR, 'Detected invalid signature') in caplog.record_tuples
+    assert result['statusCode'] == 500
 
 def test_message_no_shrine(mocker: MockerFixture):
     # Twitterへのリクエストをmock
@@ -106,7 +134,7 @@ def test_join_exist_id(mocker: MockerFixture, caplog: LogCaptureFixture):
 def test_lambda_handler_leave(mocker: MockerFixture):
     event = {
         "headers": {
-            "x-line-signature": "dummy"
+            "X-Line-Signature": "dummy"
         },
         "body": '{"events":[{"type":"leave","source":{"type":"group","group_id":"abcde"}}]}'
     }

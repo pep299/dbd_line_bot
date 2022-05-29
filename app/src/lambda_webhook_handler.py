@@ -73,7 +73,8 @@ def lambda_handler(event, context):
         for m in e.error.details:
             logger.error("  %s: %s" % (m.property, m.message))
         return error_json
-    except InvalidSignatureError:
+    except InvalidSignatureError as e:
+        logger.error("Detected invalid signature")
         return error_json
 
     return ok_json
