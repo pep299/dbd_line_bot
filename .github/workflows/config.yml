@@ -11,6 +11,8 @@ on:
     paths-ignore:
       - '*.md'
       - 'drawio'
+permissions:
+  pull-requests: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -35,7 +37,13 @@ jobs:
           poetry install --no-interaction
       - name: Test with pytest
         run: |
-          poetry run pytest
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src | tee pytest-coverage.txt
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: app/pytest-coverage.txt
+          junitxml-path: app/pytest.xml
+          coverage-path-prefix: app/
   aws_cdk:
     runs-on: ubuntu-latest
     defaults:
