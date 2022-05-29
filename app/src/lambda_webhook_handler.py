@@ -1,6 +1,6 @@
 import logging
 import json
-from .env import IS_PROD, IS_DEV, IS_TEST, get_env
+from .env import IS_PROD, IS_DEV, get_env
 
 from linebot import (
     LineBotApi, WebhookHandler
