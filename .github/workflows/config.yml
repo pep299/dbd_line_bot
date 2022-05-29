@@ -77,9 +77,9 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: CDK diff check
+      - name: Test
         if: contains(github.event_name, 'pull_request')
-        run: npm run cdk:diff
+        run: npm run test
 
       - name: CDK deploy
         if: contains(github.event_name, 'push')
