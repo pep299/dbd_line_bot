@@ -14,6 +14,7 @@ sequenceDiagram
   Lambda.webhook_handler -->> LINE: 
   Lambda.batch ->> Lambda.batch: 毎日9,21時半に起動
   Lambda.batch ->> Twitter: ツイートを取得
+  Twitter -->> Lambda.batch: 
   opt 条件に合致するツイートがある場合
     Lambda.batch ->> S3: idを読み込み
     S3 -->> Lambda.batch: 
