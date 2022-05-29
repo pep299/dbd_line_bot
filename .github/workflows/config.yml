@@ -43,7 +43,7 @@ jobs:
         with:
           pytest-coverage-path: app/pytest-coverage.txt
           junitxml-path: app/pytest.xml
-          coverage-path-prefix: app
+          coverage-path-prefix: app/
   aws_cdk:
     runs-on: ubuntu-latest
     defaults:
