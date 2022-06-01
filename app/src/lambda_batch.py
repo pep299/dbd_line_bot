@@ -8,7 +8,7 @@ from linebot.models import TextSendMessage
 from linebot.exceptions import LineBotApiError
 
 import boto3
-from tweepy import OAuthHandler, API
+from tweepy import OAuth2BearerHandler, API
 from tweepy.models import Status
 
 # global変数
@@ -33,8 +33,7 @@ if IS_PROD or IS_DEV:
     s3 = boto3.resource("s3")
 
     # Twitter APIの設定
-    auth = OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
-    auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
+    auth = OAuth2BearerHandler(env.TWITTER_BEARER_TOKEN)
     twitter_api = API(auth)
 
 def lambda_handler(event, context):

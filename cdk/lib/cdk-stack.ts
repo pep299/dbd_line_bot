@@ -27,10 +27,7 @@ export class CdkStack extends Stack {
       LINE_CHANNEL_ACCESS_TOKEN: process.env.LINE_CHANNEL_ACCESS_TOKEN!!,
       S3_BUCKET_NAME: process.env.S3_BUCKET_NAME!!,
       S3_KEY_NAME: process.env.S3_KEY_NAME!!,
-      TWITTER_ACCESS_TOKEN: process.env.TWITTER_ACCESS_TOKEN!!,
-      TWITTER_ACCESS_TOKEN_SECRET: process.env.TWITTER_ACCESS_TOKEN_SECRET!!,
-      TWITTER_CONSUMER_KEY: process.env.TWITTER_CONSUMER_KEY!!,
-      TWITTER_CONSUMER_SECRET: process.env.TWITTER_CONSUMER_SECRET!!,
+      TWITTER_BEARER_TOKEN: process.env.TWITTER_BEARER_TOKEN!!,
     };
 
     const bundlingAssetLambdaCode = new Asset(this, 'BundlingAssetLambdaCode', {
