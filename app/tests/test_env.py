@@ -10,10 +10,7 @@ def set_env():
     os.environ['LINE_CHANNEL_ACCESS_TOKEN'] = 'lcat'
     os.environ['S3_BUCKET_NAME'] = 's3bn'
     os.environ['S3_KEY_NAME'] = 's3kn'
-    os.environ['TWITTER_CONSUMER_KEY'] = 'tck'
-    os.environ['TWITTER_CONSUMER_SECRET'] = 'tcs'
-    os.environ['TWITTER_ACCESS_TOKEN'] = 'tat'
-    os.environ['TWITTER_ACCESS_TOKEN_SECRET'] = 'tats'
+    os.environ['TWITTER_BEARER_TOKEN'] = 'tbt'
 
 def test_get_env(set_env):
     expected = Env(
@@ -21,10 +18,7 @@ def test_get_env(set_env):
         LINE_CHANNEL_ACCESS_TOKEN = 'lcat',
         S3_BUCKET_NAME = 's3bn',
         S3_KEY_NAME = 's3kn',
-        TWITTER_CONSUMER_KEY = 'tck',
-        TWITTER_CONSUMER_SECRET = 'tcs',
-        TWITTER_ACCESS_TOKEN = 'tat',
-        TWITTER_ACCESS_TOKEN_SECRET = 'tats',
+        TWITTER_BEARER_TOKEN = 'tbt',
     )
     assert vars(get_env()) == vars(expected)
 

@@ -16,19 +16,13 @@ class Env:
         LINE_CHANNEL_ACCESS_TOKEN = '',
         S3_BUCKET_NAME = '',
         S3_KEY_NAME = '',
-        TWITTER_CONSUMER_KEY = '',
-        TWITTER_CONSUMER_SECRET = '',
-        TWITTER_ACCESS_TOKEN = '',
-        TWITTER_ACCESS_TOKEN_SECRET = '',
+        TWITTER_BEARER_TOKEN = '',
     ) -> None:
         self.LINE_CHANNEL_SECRET = LINE_CHANNEL_SECRET
         self.LINE_CHANNEL_ACCESS_TOKEN = LINE_CHANNEL_ACCESS_TOKEN
         self.S3_BUCKET_NAME = S3_BUCKET_NAME
         self.S3_KEY_NAME = S3_KEY_NAME
-        self.TWITTER_CONSUMER_KEY = TWITTER_CONSUMER_KEY
-        self.TWITTER_CONSUMER_SECRET = TWITTER_CONSUMER_SECRET
-        self.TWITTER_ACCESS_TOKEN = TWITTER_ACCESS_TOKEN
-        self.TWITTER_ACCESS_TOKEN_SECRET = TWITTER_ACCESS_TOKEN_SECRET
+        self.TWITTER_BEARER_TOKEN = TWITTER_BEARER_TOKEN
 
 def get_env() -> Env:
     return Env(
@@ -36,10 +30,7 @@ def get_env() -> Env:
         LINE_CHANNEL_ACCESS_TOKEN = get_env_by_key('LINE_CHANNEL_ACCESS_TOKEN'),
         S3_BUCKET_NAME = get_env_by_key('S3_BUCKET_NAME'),
         S3_KEY_NAME = get_env_by_key('S3_KEY_NAME'),
-        TWITTER_CONSUMER_KEY = get_env_by_key('TWITTER_CONSUMER_KEY'),
-        TWITTER_CONSUMER_SECRET = get_env_by_key('TWITTER_CONSUMER_SECRET'),
-        TWITTER_ACCESS_TOKEN = get_env_by_key('TWITTER_ACCESS_TOKEN'),
-        TWITTER_ACCESS_TOKEN_SECRET = get_env_by_key('TWITTER_ACCESS_TOKEN_SECRET'),
+        TWITTER_BEARER_TOKEN = get_env_by_key('TWITTER_BEARER_TOKEN'),
     )
 
 def get_env_by_key(key: str) -> str:

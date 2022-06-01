@@ -12,7 +12,7 @@ from linebot.exceptions import (
     LineBotApiError, InvalidSignatureError
 )
 import boto3
-import tweepy
+from tweepy import OAuth2BearerHandler, API
 
 # global変数
 logger = None
@@ -38,9 +38,8 @@ if IS_PROD or IS_DEV:
     s3 = boto3.resource("s3")
 
     # Twitter APIの設定
-    auth = tweepy.OAuthHandler(env.TWITTER_CONSUMER_KEY, env.TWITTER_CONSUMER_SECRET)
-    auth.set_access_token(env.TWITTER_ACCESS_TOKEN, env.TWITTER_ACCESS_TOKEN_SECRET)
-    twitter_api = tweepy.API(auth)
+    auth = OAuth2BearerHandler(env.TWITTER_BEARER_TOKEN)
+    twitter_api = API(auth)
 
 if IS_TEST:
     env = get_env()
