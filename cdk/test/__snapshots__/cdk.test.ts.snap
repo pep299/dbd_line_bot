@@ -24,7 +24,6 @@ Object {
         },
         "Environment": Object {
           "Variables": Object {
-            "ENV_NAME": "prod",
             "LINE_CHANNEL_ACCESS_TOKEN": "[SEC REMOVED]",
             "LINE_CHANNEL_SECRET": "[SEC REMOVED]",
             "S3_BUCKET_NAME": "line-ids",
@@ -285,7 +284,6 @@ Object {
         },
         "Environment": Object {
           "Variables": Object {
-            "ENV_NAME": "prod",
             "LINE_CHANNEL_ACCESS_TOKEN": "[SEC REMOVED]",
             "LINE_CHANNEL_SECRET": "[SEC REMOVED]",
             "S3_BUCKET_NAME": "line-ids",

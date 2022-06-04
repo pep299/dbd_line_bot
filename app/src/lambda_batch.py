@@ -1,7 +1,7 @@
 import logging
 import json
 from datetime import datetime, timedelta, timezone
-from .env import get_env, IS_PROD, IS_DEV
+from .env import get_env
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
@@ -11,30 +11,9 @@ import boto3
 from tweepy import OAuth2BearerHandler, API
 from tweepy.models import Status
 
-# global変数
-logger = None
-env = None
-line_bot_api = None
-s3 = None
-twitter_api = None
-
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-if IS_PROD or IS_DEV:
-    # env取得
-    env = get_env()
-
-    # LINE botの設定
-    line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
-
-    # s3の設定
-    s3 = boto3.resource("s3")
-
-    # Twitter APIの設定
-    auth = OAuth2BearerHandler(env.TWITTER_BEARER_TOKEN)
-    twitter_api = API(auth)
 
 def lambda_handler(event, context):
     ok_json = {
@@ -49,14 +28,24 @@ def lambda_handler(event, context):
         "headers": {},
         "body": "Error"
     }
+
+    env = get_env()
+
     sender_ids = get_sender_ids(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
 
-    push_list = get_send_message_by_dbd_official()
-    push_list += get_send_message_by_ruby_nea()
+    auth = OAuth2BearerHandler(env.TWITTER_BEARER_TOKEN)
+    twitter_api = API(auth)
 
-    return ok_json if send_message(push_list, sender_ids) else error_json
+    push_list = get_send_message_by_dbd_official(twitter_api)
+    push_list += get_send_message_by_ruby_nea(twitter_api)
 
-def send_message(push_list: list[Status], sender_ids: list[str]) -> bool:
+    return ok_json if send_message(push_list, sender_ids, env.LINE_CHANNEL_ACCESS_TOKEN) else error_json
+
+def send_message(push_list: list[Status], sender_ids: list[str], line_channel_access_token: str) -> bool:
+    if not push_list:
+        return True
+
+    line_bot_api = LineBotApi(line_channel_access_token)
     raise_error = False
     for status in push_list:
         messages = []
@@ -73,10 +62,11 @@ def send_message(push_list: list[Status], sender_ids: list[str]) -> bool:
     return not raise_error
 
 def get_sender_ids(bucket :str, key: str) -> list[str]:
+    s3 = boto3.resource("s3")
     obj = s3.Object(bucket, key)
     return json.loads(obj.get()['Body'].read())
 
-def get_send_message_by_dbd_official() -> list[Status]:
+def get_send_message_by_dbd_official(twitter_api: API) -> list[Status]:
     SCREEN_NAME = 'DeadbyBHVR_JP'
     OUTPUT_FILTER = [
         'シュライン・オブ・シークレット',
@@ -85,21 +75,22 @@ def get_send_message_by_dbd_official() -> list[Status]:
         'ブラッドポイント',
         'インデスントシャード',
         'シャード',
-        'アップデート'
+        'アップデート',
+        'ログイン',
     ]
-    statuses = get_statuses(SCREEN_NAME)
+    statuses = get_statuses(twitter_api, SCREEN_NAME)
     return [status for status in statuses if judge_output_status(status, OUTPUT_FILTER)]
 
-def get_send_message_by_ruby_nea() -> list[Status]:
+def get_send_message_by_ruby_nea(twitter_api: API) -> list[Status]:
     SCREEN_NAME = 'Ruby_Nea_'
     OUTPUT_FILTER = [
         '引き換えコード',
         'コード',
     ]
-    statuses = get_statuses(SCREEN_NAME)
+    statuses = get_statuses(twitter_api, SCREEN_NAME)
     return [status for status in statuses if judge_output_status(status, OUTPUT_FILTER)]
 
-def get_statuses(screen_name: str) -> list[Status]:
+def get_statuses(twitter_api: API, screen_name: str) -> list[Status]:
     return twitter_api.user_timeline(screen_name=screen_name, count=20, tweet_mode='extended', exclude_replies=True, include_rts=False)
 
 def judge_output_status(status: Status, filter_list: list) -> bool:
