@@ -22,11 +22,9 @@ export class CdkStack extends Stack {
     });
 
     const lambdaEnv = {
-      LINE_CHANNEL_SECRET: process.env.LINE_CHANNEL_SECRET!!,
-      LINE_CHANNEL_ACCESS_TOKEN: process.env.LINE_CHANNEL_ACCESS_TOKEN!!,
-      S3_BUCKET_NAME: process.env.S3_BUCKET_NAME!!,
-      S3_KEY_NAME: process.env.S3_KEY_NAME!!,
-      TWITTER_BEARER_TOKEN: process.env.TWITTER_BEARER_TOKEN!!,
+      ENV_NAME: 'prod',
+      S3_BUCKET_NAME: 'line-ids',
+      S3_KEY_NAME: 'ids.json',
     };
 
     const bundlingAssetLambdaCode = new Asset(this, 'BundlingAssetLambdaCode', {

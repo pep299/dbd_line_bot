@@ -51,14 +51,6 @@ jobs:
     defaults:
       run:
         working-directory: cdk
-    env:
-      AWS_DEFAULT_REGION: 'us-east-2'
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
-      LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-      S3_KEY_NAME: ${{ secrets.S3_KEY_NAME }}
-      TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -73,8 +65,8 @@ jobs:
       - name: AWS set token
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-deploy
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-to-assume: arn:aws:iam::${{ secret.AWS_ACCOUNT_ID }}:role/github-actions-deploy
+          aws-region: 'us-east-2'
       - name: Test
         if: contains(github.event_name, 'pull_request')
         run: npm run test

@@ -24,11 +24,9 @@ Object {
         },
         "Environment": Object {
           "Variables": Object {
-            "LINE_CHANNEL_ACCESS_TOKEN": "[SEC REMOVED]",
-            "LINE_CHANNEL_SECRET": "[SEC REMOVED]",
+            "ENV_NAME": "prod",
             "S3_BUCKET_NAME": "line-ids",
             "S3_KEY_NAME": "ids.json",
-            "TWITTER_BEARER_TOKEN": "[SEC REMOVED]",
           },
         },
         "Handler": "src/lambda_batch.lambda_handler",
@@ -284,11 +282,9 @@ Object {
         },
         "Environment": Object {
           "Variables": Object {
-            "LINE_CHANNEL_ACCESS_TOKEN": "[SEC REMOVED]",
-            "LINE_CHANNEL_SECRET": "[SEC REMOVED]",
+            "ENV_NAME": "prod",
             "S3_BUCKET_NAME": "line-ids",
             "S3_KEY_NAME": "ids.json",
-            "TWITTER_BEARER_TOKEN": "[SEC REMOVED]",
           },
         },
         "Handler": "src/lambda_webhook_handler.lambda_handler",
