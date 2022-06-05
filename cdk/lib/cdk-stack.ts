@@ -66,11 +66,11 @@ export class CdkStack extends Stack {
       logRetention: RetentionDays.TWO_MONTHS,
     });
 
-    const url = webhookHandlerStack.addFunctionUrl({
+    webhookHandlerStack.addFunctionUrl({
       authType: FunctionUrlAuthType.NONE,
     });
 
-    const batchStack = new Function(this, 'BatchFunction', {
+    const batchStack = new Function(this, "BatchFunction", {
       code: Code.fromBucket(
         bundlingAssetLambdaCode.bucket,
         bundlingAssetLambdaCode.s3ObjectKey
