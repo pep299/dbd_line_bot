@@ -1,9 +1,9 @@
 module.exports = {
-  testEnvironment: 'node',
-  roots: ['<rootDir>/test'],
-  testMatch: ['**/*.test.ts'],
+  testEnvironment: "node",
+  roots: ["<rootDir>/test"],
+  testMatch: ["**/*.test.ts"],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    "^.+\\.tsx?$": "ts-jest",
   },
-  snapshotSerializers: ['<rootDir>/test/snapshot-serializer.ts']
+  snapshotSerializers: ["<rootDir>/test/snapshot-serializer.ts"],
 };
