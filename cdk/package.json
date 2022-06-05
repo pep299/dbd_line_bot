@@ -7,9 +7,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "eslint": "eslint './{bin,lib,src,tests}/**/*.ts'",
-    "pritter:check": "pritter --check ..",
-    "pritter:write": "pritter --write ..",
+    "eslint": "eslint './{bin,lib,src,test}/**/*.ts'",
+    "prettier:check": "prettier --check ..",
+    "prettier:write": "prettier --write ..",
     "test": "jest",
     "snap": "jest --updateSnapshot",
     "cdk": "cdk",
