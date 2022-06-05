@@ -1,2 +1,4 @@
 # Ignore artifacts:
 cdk.out
+app
+README.md

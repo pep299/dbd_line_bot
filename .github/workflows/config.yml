@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths-ignore:
-      - '*.md'
-      - 'drawio'
+      - "*.md"
+      - "drawio"
   pull_request:
     paths-ignore:
-      - '*.md'
-      - 'drawio'
+      - "*.md"
+      - "drawio"
 permissions:
   pull-requests: write
   id-token: write
@@ -25,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: Install portry
         run: |
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
@@ -66,7 +66,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-deploy
-          aws-region: 'us-east-2'
+          aws-region: "us-east-2"
       - name: Test
         if: contains(github.event_name, 'pull_request')
         run: npm run test
