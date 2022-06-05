@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "eslint": "eslint './{bin,lib,src,test}/**/*.ts'",
+    "eslint": "eslint './{bin,lib,src,test}/**/*.ts' --max-warnings=0",
     "prettier:check": "prettier --check ..",
     "prettier:write": "prettier --write ..",
     "test": "jest",
