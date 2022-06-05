@@ -42,9 +42,6 @@ def lambda_handler(event, context):
     return ok_json if send_message(push_list, sender_ids, env.LINE_CHANNEL_ACCESS_TOKEN) else error_json
 
 def send_message(push_list: list[Status], sender_ids: list[str], line_channel_access_token: str) -> bool:
-    if not push_list:
-        return True
-
     line_bot_api = LineBotApi(line_channel_access_token)
     raise_error = False
     for status in push_list:
