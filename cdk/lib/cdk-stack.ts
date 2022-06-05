@@ -18,6 +18,7 @@ export class CdkStack extends Stack {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMReadOnlyAccess'),
       ],
     });
 
