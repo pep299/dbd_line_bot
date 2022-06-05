@@ -15,6 +15,26 @@ permissions:
   pull-requests: write
   id-token: write
 jobs:
+  ts-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cdk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Setup dependencies
+        run: npm ci
+      - name: eslint
+        if: ${{ always() }}
+        run: npm run eslint
+      - name: prettier check
+        if: ${{ always() }}
+        run: npm run prettier:check
   test:
     runs-on: ubuntu-latest
     defaults:
@@ -60,8 +80,6 @@ jobs:
           node-version: "16"
       - name: Setup dependencies
         run: npm ci
-      - name: Build
-        run: npm run build
       - name: AWS set token
         uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -66,7 +66,7 @@ export class CdkStack extends Stack {
       logRetention: RetentionDays.TWO_MONTHS,
     });
 
-    const url = webhookHandlerStack.addFunctionUrl({
+    webhookHandlerStack.addFunctionUrl({
       authType: FunctionUrlAuthType.NONE,
     });
 
@@ -83,7 +83,7 @@ export class CdkStack extends Stack {
       logRetention: RetentionDays.TWO_MONTHS,
     });
 
-    const batchInvoke = new Rule(this, "DBDBotRule", {
+    new Rule(this, "DBDBotRule", {
       // cron: 毎日9:30, 21:30(JST) rule: 30 0,12 * * ? *
       schedule: Schedule.cron({
         minute: "30",
