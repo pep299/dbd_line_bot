@@ -96,13 +96,15 @@ def get_send_message_by_ruby_nea(twitter_api: API) -> List[Status]:
 
 
 def get_statuses(twitter_api: API, screen_name: str) -> List[Status]:
-    return list(twitter_api.user_timeline(
-        screen_name=screen_name,
-        count=20,
-        tweet_mode="extended",
-        exclude_replies=True,
-        include_rts=False,
-    ))
+    return list(
+        twitter_api.user_timeline(
+            screen_name=screen_name,
+            count=20,
+            tweet_mode="extended",
+            exclude_replies=True,
+            include_rts=False,
+        )
+    )
 
 
 def judge_output_status(status: Status, filter_list: List[str]) -> bool:

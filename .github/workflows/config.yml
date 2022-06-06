@@ -59,7 +59,7 @@ jobs:
       - name: Python lint
         if: ${{ always() }}
         run: |
-          poetry run pysen run lint
+          make lint
       - name: Test with pytest
         if: ${{ always() }}
         run: |
