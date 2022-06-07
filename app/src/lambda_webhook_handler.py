@@ -1,58 +1,57 @@
-import logging
 import json
-from .env import get_env
+import logging
+from typing import Any, Dict
 
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.models import (
-    MessageEvent, JoinEvent, LeaveEvent, TextMessage, TextSendMessage
-)
-from linebot.exceptions import (
-    LineBotApiError, InvalidSignatureError
-)
 import boto3
-from tweepy import OAuth2BearerHandler, API
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError, LineBotApiError
+from linebot.models import (
+    Event,
+    JoinEvent,
+    LeaveEvent,
+    MessageEvent,
+    TextMessage,
+    TextSendMessage,
+)
+from tweepy import API, OAuth2BearerHandler
+
+from .env import Env, get_env
 
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def lambda_handler(event, context):
-    ok_json = {
-        "isBase64Encoded": False,
-        "statusCode": 200,
-        "headers": {},
-        "body": ""
-    }
+
+def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
+    ok_json = {"isBase64Encoded": False, "statusCode": 200, "headers": {}, "body": ""}
     error_json = {
         "isBase64Encoded": False,
         "statusCode": 500,
         "headers": {},
-        "body": "Error"
+        "body": "Error",
     }
 
     env = get_env()
     handler = WebhookHandler(env.LINE_CHANNEL_SECRET)
 
     @handler.add(MessageEvent, message=TextMessage)
-    def handler_message_text(event):
+    def handler_message_text(event: Event) -> None:
         text = event.message.text
         reply_token = event.reply_token
         message(text, reply_token, env)
 
     @handler.add(JoinEvent)
-    def handler_join(event):
+    def handler_join(event: Event) -> None:
         sender_id = event.source.sender_id
         store_id(sender_id, env)
 
     @handler.add(LeaveEvent)
-    def handler_leave(event):
+    def handler_leave(event: Event) -> None:
         sender_id = event.source.sender_id
         delete_id(sender_id, env)
 
     body = event["body"]
-    signature = ''
+    signature = ""
     if "x-line-signature" in event["headers"]:
         signature = event["headers"]["x-line-signature"]
     elif "X-Line-Signature" in event["headers"]:
@@ -65,19 +64,28 @@ def lambda_handler(event, context):
         for m in e.error.details:
             logger.error("  %s: %s" % (m.property, m.message))
         return error_json
-    except InvalidSignatureError as e:
+    except InvalidSignatureError:
         logger.error("Detected invalid signature")
         return error_json
 
     return ok_json
 
-def message(text, reply_token, env):
-    if text == '今週の聖堂':
+
+def message(text: str, reply_token: str, env: Env) -> None:
+    if text == "今週の聖堂":
         auth = OAuth2BearerHandler(env.TWITTER_BEARER_TOKEN)
         twitter_api = API(auth)
 
-        status_list = twitter_api.user_timeline(screen_name='DeadbyBHVR_JP', count=50, tweet_mode='extended', exclude_replies=True, include_rts=False)
-        output_list = list(filter(lambda x: 'シュライン・オブ・シークレット' in x.full_text, status_list))
+        status_list = twitter_api.user_timeline(
+            screen_name="DeadbyBHVR_JP",
+            count=50,
+            tweet_mode="extended",
+            exclude_replies=True,
+            include_rts=False,
+        )
+        output_list = list(
+            filter(lambda x: "シュライン・オブ・シークレット" in x.full_text, status_list)
+        )
 
         if not output_list:
             return
@@ -88,30 +96,32 @@ def message(text, reply_token, env):
         line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
         line_bot_api.reply_message(reply_token, messages=messages)
 
-def store_id(sender_id, env):
-    logger.info('参加先id: ' + sender_id)
+
+def store_id(sender_id: str, env: Env) -> None:
+    logger.info("参加先id: " + sender_id)
 
     s3 = boto3.resource("s3")
     obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
-    ids = json.loads(obj.get()['Body'].read())
+    ids = json.loads(obj.get()["Body"].read())
 
-    if (sender_id in ids):
-        logger.info('id重複のため書き込まない')
+    if sender_id in ids:
+        logger.info("id重複のため書き込まない")
     else:
         ids.append(sender_id)
         response = obj.put(Body=json.dumps(ids))
         logger.info(response)
 
-def delete_id(sender_id, env):
-    logger.info('退室先id: '+ sender_id)
+
+def delete_id(sender_id: str, env: Env) -> None:
+    logger.info("退室先id: " + sender_id)
 
     s3 = boto3.resource("s3")
     obj = s3.Object(env.S3_BUCKET_NAME, env.S3_KEY_NAME)
-    ids = json.loads(obj.get()['Body'].read())
+    ids = json.loads(obj.get()["Body"].read())
 
-    if (sender_id in ids):
+    if sender_id in ids:
         new_ids = list(filter(lambda x: not x == sender_id, ids))
         response = obj.put(Body=json.dumps(new_ids))
         logger.info(response)
     else:
-        logger.info('idが無いため削除しない')
+        logger.info("idが無いため削除しない")
