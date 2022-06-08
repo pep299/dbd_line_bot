@@ -8,11 +8,6 @@
     "enabled": true,
     "automerge": true
   },
-  "poetry": {
-    "fileMatch": [
-      "pyproject.toml"
-    ]
-  },
   "packageRules": [
     {
       "matchDepTypes": ["devDependencies"],
@@ -21,7 +16,7 @@
       "automerge": true
     },
     {
-      "matchDepTypes": ["tool.poetry.dev-dependencies"],
+      "matchDepTypes": ["dev-dependencies"],
       "matchPackagePatterns": ["pysen", "black", "flake8", "isort", "mypy"],
       "labels": ["linting"],
       "automerge": true
