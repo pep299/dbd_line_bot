@@ -7,11 +7,16 @@ import {
   Runtime,
   FunctionUrlAuthType,
 } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { RetentionDays, FilterPattern } from "aws-cdk-lib/aws-logs";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { Asset } from "aws-cdk-lib/aws-s3-assets";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+import { Alarm, ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
+import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { join } from "path";
 
 export class CdkStack extends Stack {
@@ -29,10 +34,19 @@ export class CdkStack extends Stack {
       ],
     });
 
+    const s3BucketName = StringParameter.valueForStringParameter(
+      this,
+      "S3_BUCKET_NAME"
+    );
+    const s3KeyName = StringParameter.valueForStringParameter(
+      this,
+      "S3_KEY_NAME"
+    );
+
     const lambdaEnv = {
       ENV_NAME: "prod",
-      S3_BUCKET_NAME: "line-ids",
-      S3_KEY_NAME: "ids.json",
+      S3_BUCKET_NAME: s3BucketName,
+      S3_KEY_NAME: s3KeyName,
     };
 
     const bundlingAssetLambdaCode = new Asset(this, "BundlingAssetLambdaCode", {
@@ -53,6 +67,7 @@ export class CdkStack extends Stack {
         user: "root",
       },
     });
+
     const webhookHandlerStack = new Function(this, "WebhookHandlerFunction", {
       code: Code.fromBucket(
         bundlingAssetLambdaCode.bucket,
@@ -95,8 +110,54 @@ export class CdkStack extends Stack {
       targets: [new LambdaFunction(batchStack)],
     });
 
-    const lineIdBucket = Bucket.fromBucketName(this, "line-ids", "line-ids");
+    const lineIdBucket = Bucket.fromBucketName(
+      this,
+      s3BucketName,
+      s3BucketName
+    );
     lineIdBucket.grantReadWrite(batchStack);
     lineIdBucket.grantReadWrite(webhookHandlerStack);
+
+    const toNotification = StringParameter.valueForStringParameter(
+      this,
+      "TO_NOTIFICATION"
+    );
+
+    const topic = new Topic(this, "DbdTopic");
+    topic.addSubscription(new EmailSubscription(toNotification));
+
+    const webhookMetric = webhookHandlerStack.logGroup.addMetricFilter(
+      "[ERROR]webhookFilter",
+      {
+        metricName: "[ERROR]WebhookHandler",
+        metricNamespace: "LogMetrics",
+        filterPattern: FilterPattern.literal("ERROR"),
+      }
+    );
+
+    const webhookAlarm = new Alarm(this, "ErrorWebhookHandlerAlarm", {
+      comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      threshold: 1,
+      evaluationPeriods: 1,
+      metric: webhookMetric.metric(),
+    });
+    webhookAlarm.addAlarmAction(new SnsAction(topic));
+
+    const batchMetric = batchStack.logGroup.addMetricFilter(
+      "[ERROR]batchFilter",
+      {
+        metricName: "[ERROR]Batch",
+        metricNamespace: "LogMetrics",
+        filterPattern: FilterPattern.literal("ERROR"),
+      }
+    );
+
+    const batchAlarm = new Alarm(this, "ErrorBatchAlarm", {
+      comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+      threshold: 1,
+      evaluationPeriods: 1,
+      metric: batchMetric.metric(),
+    });
+    batchAlarm.addAlarmAction(new SnsAction(topic));
   }
 }

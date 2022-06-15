@@ -32,14 +32,12 @@ def get_env() -> Env:
                 "LINE_CHANNEL_SECRET",
                 "LINE_CHANNEL_ACCESS_TOKEN",
                 "TWITTER_BEARER_TOKEN",
+                "S3_BUCKET_NAME",
+                "S3_KEY_NAME",
             ],
         )
         secrets = {store["Name"]: store["Value"] for store in response["Parameters"]}
-        return Env(
-            S3_BUCKET_NAME=get_env_by_key("S3_BUCKET_NAME"),
-            S3_KEY_NAME=get_env_by_key("S3_KEY_NAME"),
-            **secrets,
-        )
+        return Env(**secrets)
     else:
         return Env(
             S3_BUCKET_NAME=get_env_by_key("S3_BUCKET_NAME"),

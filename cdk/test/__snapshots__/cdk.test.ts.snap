@@ -8,6 +8,18 @@ Object {
       "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
+    "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+      "Default": "S3_BUCKET_NAME",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+    "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+      "Default": "S3_KEY_NAME",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+    "SsmParameterValueTONOTIFICATIONC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+      "Default": "TO_NOTIFICATION",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
   },
   "Resources": Object {
     "BatchFunction768110B6": Object {
@@ -25,8 +37,12 @@ Object {
         "Environment": Object {
           "Variables": Object {
             "ENV_NAME": "prod",
-            "S3_BUCKET_NAME": "line-ids",
-            "S3_KEY_NAME": "ids.json",
+            "S3_BUCKET_NAME": Object {
+              "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
+            "S3_KEY_NAME": Object {
+              "Ref": "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
           },
         },
         "Handler": "src/lambda_batch.lambda_handler",
@@ -40,6 +56,25 @@ Object {
         "Timeout": 300,
       },
       "Type": "AWS::Lambda::Function",
+    },
+    "BatchFunctionLogGroupERRORbatchFilter7387FF17": Object {
+      "Properties": Object {
+        "FilterPattern": "ERROR",
+        "LogGroupName": Object {
+          "Fn::GetAtt": Array [
+            "BatchFunctionLogRetention791C2146",
+            "LogGroupName",
+          ],
+        },
+        "MetricTransformations": Array [
+          Object {
+            "MetricName": "[ERROR]Batch",
+            "MetricNamespace": "LogMetrics",
+            "MetricValue": "1",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::MetricFilter",
     },
     "BatchFunctionLogRetention791C2146": Object {
       "Properties": Object {
@@ -101,6 +136,55 @@ Object {
       },
       "Type": "AWS::Events::Rule",
     },
+    "DbdTopic54D06245": Object {
+      "Type": "AWS::SNS::Topic",
+    },
+    "DbdTopicTokenSubscription1CB27C04C": Object {
+      "Properties": Object {
+        "Endpoint": Object {
+          "Ref": "SsmParameterValueTONOTIFICATIONC96584B6F00A464EAD1953AFF4B05118Parameter",
+        },
+        "Protocol": "email",
+        "TopicArn": Object {
+          "Ref": "DbdTopic54D06245",
+        },
+      },
+      "Type": "AWS::SNS::Subscription",
+    },
+    "ErrorBatchAlarmE5BA3B6F": Object {
+      "Properties": Object {
+        "AlarmActions": Array [
+          Object {
+            "Ref": "DbdTopic54D06245",
+          },
+        ],
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 1,
+        "MetricName": "[ERROR]Batch",
+        "Namespace": "LogMetrics",
+        "Period": 300,
+        "Statistic": "Average",
+        "Threshold": 1,
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "ErrorWebhookHandlerAlarm3327A287": Object {
+      "Properties": Object {
+        "AlarmActions": Array [
+          Object {
+            "Ref": "DbdTopic54D06245",
+          },
+        ],
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 1,
+        "MetricName": "[ERROR]WebhookHandler",
+        "Namespace": "LogMetrics",
+        "Period": 300,
+        "Statistic": "Average",
+        "Threshold": 1,
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
     "IamRoleForLambdaDefaultPolicyE9A800CF": Object {
       "Properties": Object {
         "PolicyDocument": Object {
@@ -128,7 +212,10 @@ Object {
                       Object {
                         "Ref": "AWS::Partition",
                       },
-                      ":s3:::line-ids",
+                      ":s3:::",
+                      Object {
+                        "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+                      },
                     ],
                   ],
                 },
@@ -140,7 +227,11 @@ Object {
                       Object {
                         "Ref": "AWS::Partition",
                       },
-                      ":s3:::line-ids/*",
+                      ":s3:::",
+                      Object {
+                        "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+                      },
+                      "/*",
                     ],
                   ],
                 },
@@ -295,8 +386,12 @@ Object {
         "Environment": Object {
           "Variables": Object {
             "ENV_NAME": "prod",
-            "S3_BUCKET_NAME": "line-ids",
-            "S3_KEY_NAME": "ids.json",
+            "S3_BUCKET_NAME": Object {
+              "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
+            "S3_KEY_NAME": Object {
+              "Ref": "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
           },
         },
         "Handler": "src/lambda_webhook_handler.lambda_handler",
@@ -322,6 +417,25 @@ Object {
         },
       },
       "Type": "AWS::Lambda::Url",
+    },
+    "WebhookHandlerFunctionLogGroupERRORwebhookFilter174294BF": Object {
+      "Properties": Object {
+        "FilterPattern": "ERROR",
+        "LogGroupName": Object {
+          "Fn::GetAtt": Array [
+            "WebhookHandlerFunctionLogRetention8DFD3B50",
+            "LogGroupName",
+          ],
+        },
+        "MetricTransformations": Array [
+          Object {
+            "MetricName": "[ERROR]WebhookHandler",
+            "MetricNamespace": "LogMetrics",
+            "MetricValue": "1",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::MetricFilter",
     },
     "WebhookHandlerFunctionLogRetention8DFD3B50": Object {
       "Properties": Object {

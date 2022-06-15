@@ -37,12 +37,14 @@ def test_get_env_prod(set_env: Any) -> None:
     ssm.put_parameter(Name="LINE_CHANNEL_SECRET", Value="ssm_lcs")
     ssm.put_parameter(Name="LINE_CHANNEL_ACCESS_TOKEN", Value="ssm_lcat")
     ssm.put_parameter(Name="TWITTER_BEARER_TOKEN", Value="ssm_tbt")
+    ssm.put_parameter(Name="S3_BUCKET_NAME", Value="ssm_s3bn")
+    ssm.put_parameter(Name="S3_KEY_NAME", Value="ssm_s3kn")
 
     expected = Env(
         LINE_CHANNEL_SECRET="ssm_lcs",
         LINE_CHANNEL_ACCESS_TOKEN="ssm_lcat",
-        S3_BUCKET_NAME="s3bn",
-        S3_KEY_NAME="s3kn",
+        S3_BUCKET_NAME="ssm_s3bn",
+        S3_KEY_NAME="ssm_s3kn",
         TWITTER_BEARER_TOKEN="ssm_tbt",
     )
     assert vars(get_env()) == vars(expected)
