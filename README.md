@@ -12,10 +12,11 @@ sequenceDiagram
   Lambda.webhook_handler ->> S3: idを書き込み
   S3 -->> Lambda.webhook_handler: 
   Lambda.webhook_handler -->> LINE: 
-  Lambda.batch ->> Lambda.batch: 毎日9,21時半に起動
-  Lambda.batch ->> Twitter: ツイートを取得
-  Twitter -->> Lambda.batch: 
-  opt 条件に合致するツイートがある場合
+  loop
+    Lambda.batch ->> Lambda.batch: 毎日9,21時半に起動
+    Lambda.batch ->> Twitter: ツイートを取得
+    Twitter -->> Lambda.batch: 
+    Note over LINE,Twitter: 条件に合致するツイートがある場合
     Lambda.batch ->> S3: idを読み込み
     S3 -->> Lambda.batch: 
     Lambda.batch ->> LINE: 参加しているトークルーム and グループ に送信
