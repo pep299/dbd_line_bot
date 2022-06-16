@@ -6,11 +6,11 @@ on:
       - main
     paths-ignore:
       - "*.md"
-      - "drawio"
+      - "drawio/**"
   pull_request:
     paths-ignore:
       - "*.md"
-      - "drawio"
+      - "drawio/**"
 permissions:
   pull-requests: write
   id-token: write
