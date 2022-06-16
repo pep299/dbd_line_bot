@@ -80,6 +80,7 @@ def get_send_message_by_dbd_official(twitter_api: API) -> List[Status]:
         "シャード",
         "アップデート",
         "ログイン",
+        "ラインナップ",
     ]
     statuses = get_statuses(twitter_api, SCREEN_NAME)
     return [status for status in statuses if judge_output_status(status, OUTPUT_FILTER)]
@@ -101,7 +102,7 @@ def get_statuses(twitter_api: API, screen_name: str) -> List[Status]:
             screen_name=screen_name,
             count=20,
             tweet_mode="extended",
-            exclude_replies=True,
+            exclude_replies=False,
             include_rts=False,
         )
     )
