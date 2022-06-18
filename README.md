@@ -9,7 +9,7 @@ Dbd official tweet to LINE Talk room and Group by LINE Bot + Twitter API + AWS
 ```mermaid
 sequenceDiagram
   LINE ->> Lambda.webhook_handler: トークルーム or グループにBotが参加
-  Lambda.webhook_handler ->> S3: idを書き込み
+  Lambda.webhook_handler ->> S3: トークルーム or グループidを書き込み
   S3 -->> Lambda.webhook_handler: 
   Lambda.webhook_handler -->> LINE: 
   loop
@@ -17,12 +17,12 @@ sequenceDiagram
     Lambda.batch ->> Twitter: ツイートを取得
     Twitter -->> Lambda.batch: 
     Note over LINE,Twitter: 条件に合致するツイートがある場合
-    Lambda.batch ->> S3: idを読み込み
+    Lambda.batch ->> S3: トークルーム or グループidを読み込み
     S3 -->> Lambda.batch: 
     Lambda.batch ->> LINE: 参加しているトークルーム and グループ に送信
   end
   LINE ->> Lambda.webhook_handler: トークルーム or グループから退室
-  Lambda.webhook_handler ->> S3: idを削除
+  Lambda.webhook_handler ->> S3: トークルーム or グループidを削除
   S3 -->> Lambda.webhook_handler: 
   Lambda.webhook_handler -->> LINE: 
 ```
