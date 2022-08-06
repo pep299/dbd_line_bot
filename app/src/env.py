@@ -1,7 +1,7 @@
-from dataclasses import dataclass
 import logging
 import os
 import sys
+from dataclasses import dataclass
 
 import boto3
 
