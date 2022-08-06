@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import logging
 import os
 import sys
@@ -8,20 +9,13 @@ logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
 
+@dataclass
 class Env:
-    def __init__(
-        self,
-        LINE_CHANNEL_SECRET: str = "",
-        LINE_CHANNEL_ACCESS_TOKEN: str = "",
-        S3_BUCKET_NAME: str = "",
-        S3_KEY_NAME: str = "",
-        TWITTER_BEARER_TOKEN: str = "",
-    ) -> None:
-        self.LINE_CHANNEL_SECRET = LINE_CHANNEL_SECRET
-        self.LINE_CHANNEL_ACCESS_TOKEN = LINE_CHANNEL_ACCESS_TOKEN
-        self.S3_BUCKET_NAME = S3_BUCKET_NAME
-        self.S3_KEY_NAME = S3_KEY_NAME
-        self.TWITTER_BEARER_TOKEN = TWITTER_BEARER_TOKEN
+    LINE_CHANNEL_SECRET: str = ""
+    LINE_CHANNEL_ACCESS_TOKEN: str = ""
+    S3_BUCKET_NAME: str = ""
+    S3_KEY_NAME: str = ""
+    TWITTER_BEARER_TOKEN: str = ""
 
 
 def get_env() -> Env:
