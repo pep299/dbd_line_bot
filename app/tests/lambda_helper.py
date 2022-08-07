@@ -16,6 +16,7 @@ def make_context() -> LambdaContext:
         }
     )
 
+
 def make_event_bridge_event() -> EventBridgeEvent:
     return EventBridgeEvent(
         {
