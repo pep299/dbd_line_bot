@@ -1,6 +1,5 @@
 import os
 from logging import ERROR
-from typing import Any
 
 import boto3
 import pytest
@@ -18,7 +17,7 @@ def set_env() -> None:
     os.environ["TWITTER_BEARER_TOKEN"] = "tbt"
 
 
-def test_get_env(set_env: Any) -> None:
+def test_get_env(set_env: None) -> None:
     expected = Env(
         LINE_CHANNEL_SECRET="lcs",
         LINE_CHANNEL_ACCESS_TOKEN="lcat",
@@ -30,7 +29,7 @@ def test_get_env(set_env: Any) -> None:
 
 
 @mock_ssm
-def test_get_env_prod(set_env: Any) -> None:
+def test_get_env_prod(set_env: None) -> None:
     os.environ["ENV_NAME"] = "prod"
 
     ssm = boto3.client("ssm")

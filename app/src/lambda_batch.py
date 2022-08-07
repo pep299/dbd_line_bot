@@ -1,9 +1,11 @@
 import json
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List
+from typing import List
 
 import boto3
+from aws_lambda_typing.context import Context
+from aws_lambda_typing.events import EventBridgeEvent
 from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 from linebot.models import TextSendMessage
@@ -11,20 +13,30 @@ from tweepy import API, OAuth2BearerHandler
 from tweepy.models import Status
 
 from .env import get_env
+from .lambda_types import LambdaResponse
 
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
-    ok_json = {"isBase64Encoded": False, "statusCode": 200, "headers": {}, "body": ""}
-    error_json = {
-        "isBase64Encoded": False,
-        "statusCode": 500,
-        "headers": {},
-        "body": "Error",
-    }
+def lambda_handler(event: EventBridgeEvent, context: Context) -> LambdaResponse:
+    ok_json = LambdaResponse(
+        {
+            "isBase64Encoded": False,
+            "statusCode": 200,
+            "headers": {},
+            "body": "",
+        }
+    )
+    error_json = LambdaResponse(
+        {
+            "isBase64Encoded": False,
+            "statusCode": 500,
+            "headers": {},
+            "body": "Error",
+        }
+    )
 
     env = get_env()
 

@@ -1,9 +1,10 @@
 import json
 import logging
-from typing import Any, Dict
+from typing import TypedDict
 
 import boto3
-from linebot import LineBotApi, WebhookHandler
+from aws_lambda_typing.context import Context
+from linebot import LineBotApi, WebhookHandler, WebhookPayload
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import (
     Event,
@@ -16,20 +17,41 @@ from linebot.models import (
 from tweepy import API, OAuth2BearerHandler
 
 from .env import Env, get_env
+from .lambda_types import LambdaResponse
 
 # loggerの設定
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+RequestHeadersFromLineBot = TypedDict(
+    "RequestHeadersFromLineBot",
+    {"x-line-signature": str, "X-Line-Signature": str},
+    total=False,
+)
 
-def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
-    ok_json = {"isBase64Encoded": False, "statusCode": 200, "headers": {}, "body": ""}
-    error_json = {
-        "isBase64Encoded": False,
-        "statusCode": 500,
-        "headers": {},
-        "body": "Error",
-    }
+
+class RequestFromLineBot(TypedDict):
+    headers: RequestHeadersFromLineBot
+    body: WebhookPayload
+
+
+def lambda_handler(request: RequestFromLineBot, context: Context) -> LambdaResponse:
+    ok_json = LambdaResponse(
+        {
+            "isBase64Encoded": False,
+            "statusCode": 200,
+            "headers": {},
+            "body": "",
+        }
+    )
+    error_json = LambdaResponse(
+        {
+            "isBase64Encoded": False,
+            "statusCode": 500,
+            "headers": {},
+            "body": "Error",
+        }
+    )
 
     env = get_env()
     handler = WebhookHandler(env.LINE_CHANNEL_SECRET)
@@ -50,12 +72,12 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         sender_id = event.source.sender_id
         delete_id(sender_id, env)
 
-    body = event["body"]
+    body = request["body"]
     signature = ""
-    if "x-line-signature" in event["headers"]:
-        signature = event["headers"]["x-line-signature"]
-    elif "X-Line-Signature" in event["headers"]:
-        signature = event["headers"]["X-Line-Signature"]
+    if "x-line-signature" in request["headers"]:
+        signature = request["headers"]["x-line-signature"]
+    elif "X-Line-Signature" in request["headers"]:
+        signature = request["headers"]["X-Line-Signature"]
 
     try:
         handler.handle(body, signature)
