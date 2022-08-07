@@ -13,14 +13,14 @@ from app.src.lambda_batch import (
     lambda_handler,
     send_message,
 )
-from aws_lambda_typing.context import Context
-from aws_lambda_typing.events import EventBridgeEvent
 from linebot.exceptions import LineBotApiError
 from linebot.models import TextSendMessage
 from linebot.models.error import Error, ErrorDetail
 from moto import mock_s3
 from pytest_mock import MockerFixture
 from tweepy.models import Status
+
+from .lambda_helper import make_context, make_event_bridge_event
 
 
 def setup_mock_s3(content: str) -> None:
@@ -71,28 +71,12 @@ def test_lambda_handler(mocker: MockerFixture) -> None:
     mock_line_bot_api = mocker.Mock()
     mocker.patch("app.src.lambda_batch.LineBotApi", return_value=mock_line_bot_api)
 
-    result = lambda_handler(make_event(), Context())
+    result = lambda_handler(make_event_bridge_event(), make_context())
 
     assert result["statusCode"] == 200
     assert mock_line_bot_api.push_message.call_count == 2
     mock_line_bot_api.push_message.assert_called_with(
         "abcde", messages=[TextSendMessage(text=send_message)]
-    )
-
-
-def make_event() -> EventBridgeEvent:
-    return EventBridgeEvent(
-        {
-            "version": "",
-            "id": "",
-            "detail-type": "",
-            "source": "",
-            "account": "",
-            "time": "",
-            "region": "",
-            "resources": [],
-            "detail": {},
-        }
     )
 
 

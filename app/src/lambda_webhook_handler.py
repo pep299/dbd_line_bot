@@ -3,7 +3,6 @@ import logging
 from typing import TypedDict
 
 import boto3
-from aws_lambda_typing.context import Context
 from linebot import LineBotApi, WebhookHandler, WebhookPayload
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import (
@@ -17,7 +16,7 @@ from linebot.models import (
 from tweepy import API, OAuth2BearerHandler
 
 from .env import Env, get_env
-from .lambda_types import LambdaResponse
+from .lambda_types import LambdaContext, LambdaResponse
 
 # loggerの設定
 logger = logging.getLogger()
@@ -35,7 +34,9 @@ class RequestFromLineBot(TypedDict):
     body: WebhookPayload
 
 
-def lambda_handler(request: RequestFromLineBot, context: Context) -> LambdaResponse:
+def lambda_handler(
+    request: RequestFromLineBot, context: LambdaContext
+) -> LambdaResponse:
     ok_json = LambdaResponse(
         {
             "isBase64Encoded": False,

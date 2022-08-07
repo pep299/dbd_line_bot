@@ -15,13 +15,14 @@ from app.src.lambda_webhook_handler import (
     message,
     store_id,
 )
-from aws_lambda_typing.context import Context
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import TextSendMessage
 from linebot.models.error import Error, ErrorDetail
 from moto import mock_s3
 from pytest_mock import MockerFixture
 from tweepy.models import Status
+
+from .lambda_helper import make_context
 
 
 def mock_line_bot_api(mocker: MockerFixture) -> Mock:
@@ -60,7 +61,7 @@ def test_lambda_handler_message(mocker: MockerFixture) -> None:
     # LINEへのリクエストをmock
     mock_reply_message = mock_line_bot_api(mocker)
 
-    result = lambda_handler(event, Context())
+    result = lambda_handler(event, make_context())
 
     assert result["statusCode"] == 200
     mock_reply_message.reply_message.assert_called_once_with(
@@ -88,7 +89,7 @@ def test_line_bot_api_error(mocker: MockerFixture, caplog: LogCaptureFixture) ->
         ),
     )
 
-    result = lambda_handler(event, Context())
+    result = lambda_handler(event, make_context())
 
     assert (
         "root",
@@ -111,7 +112,7 @@ def test_invalid_signature_error(
 
     mocker.patch("linebot.WebhookHandler.handle", side_effect=InvalidSignatureError)
 
-    result = lambda_handler(event, Context())
+    result = lambda_handler(event, make_context())
 
     assert ("root", ERROR, "Detected invalid signature") in caplog.record_tuples
     assert result["statusCode"] == 500
@@ -169,7 +170,7 @@ def test_lambda_handler_join(mocker: MockerFixture) -> None:
     # 署名検証を無効にする
     mocker.patch("linebot.SignatureValidator.validate", return_value=True)
 
-    lambda_handler(event, Context())
+    lambda_handler(event, make_context())
 
     obj = boto3.resource("s3").Object("test", "test")
 
@@ -199,7 +200,7 @@ def test_lambda_handler_leave(mocker: MockerFixture) -> None:
     # 署名検証を無効にする
     mocker.patch("linebot.SignatureValidator.validate", return_value=True)
 
-    lambda_handler(event, Context())
+    lambda_handler(event, make_context())
 
     obj = boto3.resource("s3").Object("test", "test")
 
