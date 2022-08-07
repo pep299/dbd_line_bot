@@ -20,8 +20,10 @@ from moto import mock_s3
 from pytest_mock import MockerFixture
 from tweepy.models import Status
 
+from .lambda_helper import make_context, make_event_bridge_event
 
-def setup_mock_s3(mocker: MockerFixture, content: str) -> None:
+
+def setup_mock_s3(content: str) -> None:
     bucket_name = "test"
     key = "test"
     s3 = boto3.resource("s3")
@@ -50,7 +52,7 @@ def setup_mock_twitter_api(
 @mock_s3
 @pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
 def test_lambda_handler(mocker: MockerFixture) -> None:
-    setup_mock_s3(mocker, '["abcde"]')
+    setup_mock_s3('["abcde"]')
 
     send_message = "引き換えコード: dummy"
     created_at = "Tue Feb 22 13:00:00 +0000 2022"
@@ -69,7 +71,7 @@ def test_lambda_handler(mocker: MockerFixture) -> None:
     mock_line_bot_api = mocker.Mock()
     mocker.patch("app.src.lambda_batch.LineBotApi", return_value=mock_line_bot_api)
 
-    result = lambda_handler(None, None)
+    result = lambda_handler(make_event_bridge_event(), make_context())
 
     assert result["statusCode"] == 200
     assert mock_line_bot_api.push_message.call_count == 2
@@ -148,9 +150,7 @@ def test_no_get_ruby_nea(mocker: MockerFixture) -> None:
     ],
 )
 @pytest.mark.freeze_time(datetime(2022, 2, 22, 13, 00, 00, 000000, tzinfo=timezone.utc))
-def test_date_filter_judge_output_status(
-    mocker: MockerFixture, input: str, expected: bool
-) -> None:
+def test_date_filter_judge_output_status(input: str, expected: bool) -> None:
     filters = ["test"]
     test_status = Status.parse(None, {"full_text": "test!", "created_at": input})
 
