@@ -18,7 +18,7 @@ jobs:
           echo "::set-output name=value::$(echo $pr_list | jq -c .)"
   assign_pr:
     needs: get_pr_matrix
-    if: needs.get_pr_matrix.outputs.matrix != []
+    if: needs.get_pr_matrix.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
