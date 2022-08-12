@@ -1,6 +1,8 @@
 name: assign-reviewer
 
-on: push
+on:
+  schedule:
+    - cron: "0 9 * * *"
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
@@ -16,7 +18,7 @@ jobs:
       - id: matrix
         name: filter past 1day PR && format github actions matrix
         run: |
-          pr_list=$(gh pr list --search "created:<=`TZ=UTC date -d "now" "+%Y-%m-%dT%H:%M:%S"` state:open" --json number | jq '[.[].number]')
+          pr_list=$(gh pr list --search "created:<=`TZ=UTC date -d "now 1days ago" "+%Y-%m-%dT%H:%M:%S"` state:open" --json number | jq '[.[].number]')
           echo "::set-output name=value::$(echo $pr_list | jq -c .)"
   assign_pr:
     needs: get_pr_matrix
