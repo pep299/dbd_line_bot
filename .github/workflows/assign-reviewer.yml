@@ -1,8 +1,6 @@
 name: assign-reviewer
 
-on:
-  schedule:
-    - cron: "0 9 * * *"
+on: push
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
