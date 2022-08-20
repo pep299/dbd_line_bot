@@ -14,7 +14,7 @@ boto3 = "^1.24.1"
 pytest = "^7.1.2"
 pytest-mock = "^3.7.0"
 pytest-env = "^0.6.2"
-moto = {extras = ["s3", "ssm"], version = "^3.1.11"}
+moto = {extras = ["s3", "ssm"], version = "^4.0.0"}
 pytest-freezegun = "^0.4.2"
 pytest-cov = "^3.0.0"
 pysen = "^0.10.2"
