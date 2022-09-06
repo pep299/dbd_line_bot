@@ -57,7 +57,7 @@ export class CdkStack extends Stack {
           "bash",
           "-c",
           [
-            "curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python",
+            "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.5",
             "source $HOME/.poetry/env",
             "poetry export -f requirements.txt --output /asset-output/requirements.txt",
             "pip install -r /asset-output/requirements.txt -t /asset-output",
