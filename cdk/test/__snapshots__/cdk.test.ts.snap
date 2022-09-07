@@ -1,53 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`snapshot test 1`] = `
-Object {
-  "Parameters": Object {
-    "BootstrapVersion": Object {
+{
+  "Parameters": {
+    "BootstrapVersion": {
       "Default": "/cdk-bootstrap/hnb659fds/version",
       "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
-    "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+    "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": {
       "Default": "S3_BUCKET_NAME",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
-    "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+    "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter": {
       "Default": "S3_KEY_NAME",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
-    "SsmParameterValueTONOTIFICATIONC96584B6F00A464EAD1953AFF4B05118Parameter": Object {
+    "SsmParameterValueTONOTIFICATIONC96584B6F00A464EAD1953AFF4B05118Parameter": {
       "Default": "TO_NOTIFICATION",
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
   },
-  "Resources": Object {
-    "BatchFunction768110B6": Object {
-      "DependsOn": Array [
+  "Resources": {
+    "BatchFunction768110B6": {
+      "DependsOn": [
         "IamRoleForLambdaDefaultPolicyE9A800CF",
         "IamRoleForLambdaEEC2E2DA",
       ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
           "S3Key": "[HASH REMOVED]",
         },
-        "Environment": Object {
-          "Variables": Object {
+        "Environment": {
+          "Variables": {
             "ENV_NAME": "prod",
-            "S3_BUCKET_NAME": Object {
+            "S3_BUCKET_NAME": {
               "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
             },
-            "S3_KEY_NAME": Object {
+            "S3_KEY_NAME": {
               "Ref": "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
             },
           },
         },
         "Handler": "src/lambda_batch.lambda_handler",
-        "Role": Object {
-          "Fn::GetAtt": Array [
+        "Role": {
+          "Fn::GetAtt": [
             "IamRoleForLambdaEEC2E2DA",
             "Arn",
           ],
@@ -57,17 +57,17 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "BatchFunctionLogGroupERRORbatchFilter7387FF17": Object {
-      "Properties": Object {
+    "BatchFunctionLogGroupERRORbatchFilter7387FF17": {
+      "Properties": {
         "FilterPattern": "ERROR",
-        "LogGroupName": Object {
-          "Fn::GetAtt": Array [
+        "LogGroupName": {
+          "Fn::GetAtt": [
             "BatchFunctionLogRetention791C2146",
             "LogGroupName",
           ],
         },
-        "MetricTransformations": Array [
-          Object {
+        "MetricTransformations": [
+          {
             "MetricName": "[ERROR]Batch",
             "MetricNamespace": "LogMetrics",
             "MetricValue": "1",
@@ -76,22 +76,22 @@ Object {
       },
       "Type": "AWS::Logs::MetricFilter",
     },
-    "BatchFunctionLogRetention791C2146": Object {
-      "Properties": Object {
-        "LogGroupName": Object {
-          "Fn::Join": Array [
+    "BatchFunctionLogRetention791C2146": {
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
             "",
-            Array [
+            [
               "/aws/lambda/",
-              Object {
+              {
                 "Ref": "BatchFunction768110B6",
               },
             ],
           ],
         },
         "RetentionInDays": 60,
-        "ServiceToken": Object {
-          "Fn::GetAtt": Array [
+        "ServiceToken": {
+          "Fn::GetAtt": [
             "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
             "Arn",
           ],
@@ -99,18 +99,18 @@ Object {
       },
       "Type": "Custom::LogRetention",
     },
-    "DBDBotRuleAllowEventRuleMyTestStackBatchFunction266B4DA607C642BF": Object {
-      "Properties": Object {
+    "DBDBotRuleAllowEventRuleMyTestStackBatchFunction266B4DA607C642BF": {
+      "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
+        "FunctionName": {
+          "Fn::GetAtt": [
             "BatchFunction768110B6",
             "Arn",
           ],
         },
         "Principal": "events.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::GetAtt": Array [
+        "SourceArn": {
+          "Fn::GetAtt": [
             "DBDBotRuleEA0C7F1B",
             "Arn",
           ],
@@ -118,14 +118,14 @@ Object {
       },
       "Type": "AWS::Lambda::Permission",
     },
-    "DBDBotRuleEA0C7F1B": Object {
-      "Properties": Object {
+    "DBDBotRuleEA0C7F1B": {
+      "Properties": {
         "ScheduleExpression": "cron(30 0,12 * * ? *)",
         "State": "ENABLED",
-        "Targets": Array [
-          Object {
-            "Arn": Object {
-              "Fn::GetAtt": Array [
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
                 "BatchFunction768110B6",
                 "Arn",
               ],
@@ -136,25 +136,25 @@ Object {
       },
       "Type": "AWS::Events::Rule",
     },
-    "DbdTopic54D06245": Object {
+    "DbdTopic54D06245": {
       "Type": "AWS::SNS::Topic",
     },
-    "DbdTopicTokenSubscription1CB27C04C": Object {
-      "Properties": Object {
-        "Endpoint": Object {
+    "DbdTopicTokenSubscription1CB27C04C": {
+      "Properties": {
+        "Endpoint": {
           "Ref": "SsmParameterValueTONOTIFICATIONC96584B6F00A464EAD1953AFF4B05118Parameter",
         },
         "Protocol": "email",
-        "TopicArn": Object {
+        "TopicArn": {
           "Ref": "DbdTopic54D06245",
         },
       },
       "Type": "AWS::SNS::Subscription",
     },
-    "ErrorBatchAlarmE5BA3B6F": Object {
-      "Properties": Object {
-        "AlarmActions": Array [
-          Object {
+    "ErrorBatchAlarmE5BA3B6F": {
+      "Properties": {
+        "AlarmActions": [
+          {
             "Ref": "DbdTopic54D06245",
           },
         ],
@@ -168,10 +168,10 @@ Object {
       },
       "Type": "AWS::CloudWatch::Alarm",
     },
-    "ErrorWebhookHandlerAlarm3327A287": Object {
-      "Properties": Object {
-        "AlarmActions": Array [
-          Object {
+    "ErrorWebhookHandlerAlarm3327A287": {
+      "Properties": {
+        "AlarmActions": [
+          {
             "Ref": "DbdTopic54D06245",
           },
         ],
@@ -185,12 +185,12 @@ Object {
       },
       "Type": "AWS::CloudWatch::Alarm",
     },
-    "IamRoleForLambdaDefaultPolicyE9A800CF": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
+    "IamRoleForLambdaDefaultPolicyE9A800CF": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
                 "s3:GetObject*",
                 "s3:GetBucket*",
                 "s3:List*",
@@ -203,32 +203,32 @@ Object {
                 "s3:Abort*",
               ],
               "Effect": "Allow",
-              "Resource": Array [
-                Object {
-                  "Fn::Join": Array [
+              "Resource": [
+                {
+                  "Fn::Join": [
                     "",
-                    Array [
+                    [
                       "arn:",
-                      Object {
+                      {
                         "Ref": "AWS::Partition",
                       },
                       ":s3:::",
-                      Object {
+                      {
                         "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
                       },
                     ],
                   ],
                 },
-                Object {
-                  "Fn::Join": Array [
+                {
+                  "Fn::Join": [
                     "",
-                    Array [
+                    [
                       "arn:",
-                      Object {
+                      {
                         "Ref": "AWS::Partition",
                       },
                       ":s3:::",
-                      Object {
+                      {
                         "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
                       },
                       "/*",
@@ -241,47 +241,47 @@ Object {
           "Version": "2012-10-17",
         },
         "PolicyName": "IamRoleForLambdaDefaultPolicyE9A800CF",
-        "Roles": Array [
-          Object {
+        "Roles": [
+          {
             "Ref": "IamRoleForLambdaEEC2E2DA",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "IamRoleForLambdaEEC2E2DA": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
+    "IamRoleForLambdaEEC2E2DA": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
-              "Principal": Object {
+              "Principal": {
                 "Service": "lambda.amazonaws.com",
               },
             },
           ],
           "Version": "2012-10-17",
         },
-        "ManagedPolicyArns": Array [
-          Object {
-            "Fn::Join": Array [
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
               "",
-              Array [
+              [
                 "arn:",
-                Object {
+                {
                   "Ref": "AWS::Partition",
                 },
                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
               ],
             ],
           },
-          Object {
-            "Fn::Join": Array [
+          {
+            "Fn::Join": [
               "",
-              Array [
+              [
                 "arn:",
-                Object {
+                {
                   "Ref": "AWS::Partition",
                 },
                 ":iam::aws:policy/AmazonSSMReadOnlyAccess",
@@ -293,21 +293,21 @@ Object {
       },
       "Type": "AWS::IAM::Role",
     },
-    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": Object {
-      "DependsOn": Array [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+      "DependsOn": [
         "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
         "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
       ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
           "S3Key": "[HASH REMOVED]",
         },
         "Handler": "index.handler",
-        "Role": Object {
-          "Fn::GetAtt": Array [
+        "Role": {
+          "Fn::GetAtt": [
             "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
             "Arn",
           ],
@@ -316,27 +316,27 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
-              "Principal": Object {
+              "Principal": {
                 "Service": "lambda.amazonaws.com",
               },
             },
           ],
           "Version": "2012-10-17",
         },
-        "ManagedPolicyArns": Array [
-          Object {
-            "Fn::Join": Array [
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
               "",
-              Array [
+              [
                 "arn:",
-                Object {
+                {
                   "Ref": "AWS::Partition",
                 },
                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -347,12 +347,12 @@ Object {
       },
       "Type": "AWS::IAM::Role",
     },
-    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
                 "logs:PutRetentionPolicy",
                 "logs:DeleteRetentionPolicy",
               ],
@@ -363,40 +363,40 @@ Object {
           "Version": "2012-10-17",
         },
         "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
-        "Roles": Array [
-          Object {
+        "Roles": [
+          {
             "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "WebhookHandlerFunctionC34AB3E4": Object {
-      "DependsOn": Array [
+    "WebhookHandlerFunctionC34AB3E4": {
+      "DependsOn": [
         "IamRoleForLambdaDefaultPolicyE9A800CF",
         "IamRoleForLambdaEEC2E2DA",
       ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
           "S3Key": "[HASH REMOVED]",
         },
-        "Environment": Object {
-          "Variables": Object {
+        "Environment": {
+          "Variables": {
             "ENV_NAME": "prod",
-            "S3_BUCKET_NAME": Object {
+            "S3_BUCKET_NAME": {
               "Ref": "SsmParameterValueS3BUCKETNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
             },
-            "S3_KEY_NAME": Object {
+            "S3_KEY_NAME": {
               "Ref": "SsmParameterValueS3KEYNAMEC96584B6F00A464EAD1953AFF4B05118Parameter",
             },
           },
         },
         "Handler": "src/lambda_webhook_handler.lambda_handler",
-        "Role": Object {
-          "Fn::GetAtt": Array [
+        "Role": {
+          "Fn::GetAtt": [
             "IamRoleForLambdaEEC2E2DA",
             "Arn",
           ],
@@ -406,11 +406,11 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "WebhookHandlerFunctionFunctionUrl84D7D658": Object {
-      "Properties": Object {
+    "WebhookHandlerFunctionFunctionUrl84D7D658": {
+      "Properties": {
         "AuthType": "NONE",
-        "TargetFunctionArn": Object {
-          "Fn::GetAtt": Array [
+        "TargetFunctionArn": {
+          "Fn::GetAtt": [
             "WebhookHandlerFunctionC34AB3E4",
             "Arn",
           ],
@@ -418,17 +418,17 @@ Object {
       },
       "Type": "AWS::Lambda::Url",
     },
-    "WebhookHandlerFunctionLogGroupERRORwebhookFilter174294BF": Object {
-      "Properties": Object {
+    "WebhookHandlerFunctionLogGroupERRORwebhookFilter174294BF": {
+      "Properties": {
         "FilterPattern": "ERROR",
-        "LogGroupName": Object {
-          "Fn::GetAtt": Array [
+        "LogGroupName": {
+          "Fn::GetAtt": [
             "WebhookHandlerFunctionLogRetention8DFD3B50",
             "LogGroupName",
           ],
         },
-        "MetricTransformations": Array [
-          Object {
+        "MetricTransformations": [
+          {
             "MetricName": "[ERROR]WebhookHandler",
             "MetricNamespace": "LogMetrics",
             "MetricValue": "1",
@@ -437,22 +437,22 @@ Object {
       },
       "Type": "AWS::Logs::MetricFilter",
     },
-    "WebhookHandlerFunctionLogRetention8DFD3B50": Object {
-      "Properties": Object {
-        "LogGroupName": Object {
-          "Fn::Join": Array [
+    "WebhookHandlerFunctionLogRetention8DFD3B50": {
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Join": [
             "",
-            Array [
+            [
               "/aws/lambda/",
-              Object {
+              {
                 "Ref": "WebhookHandlerFunctionC34AB3E4",
               },
             ],
           ],
         },
         "RetentionInDays": 60,
-        "ServiceToken": Object {
-          "Fn::GetAtt": Array [
+        "ServiceToken": {
+          "Fn::GetAtt": [
             "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
             "Arn",
           ],
@@ -460,11 +460,11 @@ Object {
       },
       "Type": "Custom::LogRetention",
     },
-    "WebhookHandlerFunctioninvokefunctionurlC5DD9BDF": Object {
-      "Properties": Object {
+    "WebhookHandlerFunctioninvokefunctionurlC5DD9BDF": {
+      "Properties": {
         "Action": "lambda:InvokeFunctionUrl",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
+        "FunctionName": {
+          "Fn::GetAtt": [
             "WebhookHandlerFunctionC34AB3E4",
             "Arn",
           ],
@@ -475,22 +475,22 @@ Object {
       "Type": "AWS::Lambda::Permission",
     },
   },
-  "Rules": Object {
-    "CheckBootstrapVersion": Object {
-      "Assertions": Array [
-        Object {
-          "Assert": Object {
-            "Fn::Not": Array [
-              Object {
-                "Fn::Contains": Array [
-                  Array [
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
                     "1",
                     "2",
                     "3",
                     "4",
                     "5",
                   ],
-                  Object {
+                  {
                     "Ref": "BootstrapVersion",
                   },
                 ],
