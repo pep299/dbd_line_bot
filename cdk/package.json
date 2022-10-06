@@ -17,7 +17,7 @@
     "cdk:deploy": "cdk deploy --require-approval never"
   },
   "devDependencies": {
-    "@types/jest": "29.1.1",
+    "@types/jest": "29.1.2",
     "@types/node": "16.11.64",
     "@typescript-eslint/eslint-plugin": "5.39.0",
     "aws-cdk": "2.45.0",
