@@ -586,7 +586,7 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-env"
-version = "0.7.0"
+version = "0.8.1"
 description = "py.test plugin that allows you to add environment variables."
 category = "dev"
 optional = false
@@ -848,7 +848,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "909dff5ec4d04f65469ea72cf4edb05ec876fe0b4821197c4d2dc96b5fe772f4"
+content-hash = "16c219890ab1db171af0081f3939e7a6d00e3f12e362795b753ad2b928a07c62"
 
 [metadata.files]
 aiohttp = [
@@ -1451,8 +1451,8 @@ pytest-cov = [
     {file = "pytest_cov-4.0.0-py3-none-any.whl", hash = "sha256:2feb1b751d66a8bd934e5edfa2e961d11309dc37b73b0eabe73b5945fee20f6b"},
 ]
 pytest-env = [
-    {file = "pytest_env-0.7.0-py3-none-any.whl", hash = "sha256:a11102037f91ab765390e6da684a99797ede08971f355eed53c7d1365d852467"},
-    {file = "pytest_env-0.7.0.tar.gz", hash = "sha256:89b6a7a00174ee289029358364b37b688e964d2cb05a8b9e4514d4ab52b134bb"},
+    {file = "pytest_env-0.8.1-py3-none-any.whl", hash = "sha256:8c0605ae09a5b7e41c20ebcc44f2c906eea9654095b4b0c342b3814bcc3a8492"},
+    {file = "pytest_env-0.8.1.tar.gz", hash = "sha256:d7b2f5273ec6d1e221757998bc2f50d2474ed7d0b9331b92556011fadc4e9abf"},
 ]
 pytest-freezegun = [
     {file = "pytest-freezegun-0.4.2.zip", hash = "sha256:19c82d5633751bf3ec92caa481fb5cffaac1787bd485f0df6436fd6242176949"},
