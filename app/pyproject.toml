@@ -13,7 +13,7 @@ boto3 = "^1.24.1"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
 pytest-mock = "^3.7.0"
-pytest-env = "^0.7.0"
+pytest-env = "^0.8.0"
 moto = {extras = ["s3", "ssm"], version = "^4.0.0"}
 pytest-freezegun = "^0.4.2"
 pytest-cov = "^4.0.0"
