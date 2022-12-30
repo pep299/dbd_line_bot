@@ -48,8 +48,8 @@ jobs:
           python-version: "3.9"
       - name: Install portry
         run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.5
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin/poetry" >> $GITHUB_PATH
       - name: Poetry Version
         run: |
           poetry --version
