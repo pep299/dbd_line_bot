@@ -1,4 +1,4 @@
-.PHONY: lint format test test-ci
+.PHONY: lint format test
 
 lint:
 	poetry run pysen run lint
@@ -8,6 +8,3 @@ format:
 
 test:
 	poetry run pytest
-
-test-ci:
-	poetry run pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src | tee pytest-coverage.txt
