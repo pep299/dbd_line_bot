@@ -62,8 +62,8 @@ jobs:
           make lint
       - name: Test with pytest
         if: ${{ always() }}
-        shell: bash
         run: |
+          set -Eo pipefail
           make test-ci
       - name: Pytest coverage comment
         if: contains(github.event_name, 'pull_request')
