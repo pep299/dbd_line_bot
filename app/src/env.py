@@ -13,6 +13,7 @@ logger.setLevel(logging.ERROR)
 class Env:
     LINE_CHANNEL_SECRET: str = ""
     LINE_CHANNEL_ACCESS_TOKEN: str = ""
+    OPENAI_API_KEY: str = ""
     S3_BUCKET_NAME: str = ""
     S3_KEY_NAME: str = ""
     TWITTER_BEARER_TOKEN: str = ""
@@ -25,6 +26,7 @@ def get_env() -> Env:
             Names=[
                 "LINE_CHANNEL_SECRET",
                 "LINE_CHANNEL_ACCESS_TOKEN",
+                "OPENAI_API_KEY",
                 "TWITTER_BEARER_TOKEN",
                 "S3_BUCKET_NAME",
                 "S3_KEY_NAME",
@@ -38,6 +40,7 @@ def get_env() -> Env:
             S3_KEY_NAME=get_env_by_key("S3_KEY_NAME"),
             LINE_CHANNEL_SECRET=get_env_by_key("LINE_CHANNEL_SECRET"),
             LINE_CHANNEL_ACCESS_TOKEN=get_env_by_key("LINE_CHANNEL_ACCESS_TOKEN"),
+            OPENAI_API_KEY=get_env_by_key("OPENAI_API_KEY"),
             TWITTER_BEARER_TOKEN=get_env_by_key("TWITTER_BEARER_TOKEN"),
         )
 

@@ -131,7 +131,28 @@ def test_message_no_shrine(mocker: MockerFixture) -> None:
 
     message("今週の聖堂", "", get_env())
 
-    mock_reply_message.assert_not_called()
+    mock_reply_message.reply_message.assert_not_called()
+
+
+def test_message_openai_call(mocker: MockerFixture) -> None:
+    # OPENAIへのリクエストをmock
+    mocker.patch("app.src.lambda_webhook_handler.openai", return_value=mocker.Mock())
+
+    # LINEへのリクエストをmock
+    mock_reply_message = mock_line_bot_api(mocker)
+
+    message("/chatgpt test", "", get_env())
+
+    mock_reply_message.reply_message.assert_called()
+
+
+def test_message_openai_no_call(mocker: MockerFixture) -> None:
+    # LINEへのリクエストをmock
+    mock_reply_message = mock_line_bot_api(mocker)
+
+    message("/chatgpt ", "", get_env())
+
+    mock_reply_message.reply_message.assert_not_called()
 
 
 def test_message_other_text(mocker: MockerFixture) -> None:
@@ -140,7 +161,7 @@ def test_message_other_text(mocker: MockerFixture) -> None:
 
     message("dummy", "", get_env())
 
-    mock_reply_message.assert_not_called()
+    mock_reply_message.reply_message.assert_not_called()
 
 
 def setup_mock_s3(content: str) -> None:
