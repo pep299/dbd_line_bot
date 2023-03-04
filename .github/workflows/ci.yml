@@ -63,8 +63,8 @@ jobs:
       - name: Test with pytest
         if: ${{ always() }}
         run: |
-          set -Eo pipefail
-          make test-ci
+          set -o pipefail
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src | tee pytest-coverage.txt
       - name: Pytest coverage comment
         if: contains(github.event_name, 'pull_request')
         uses: MishaKav/pytest-coverage-comment@main
