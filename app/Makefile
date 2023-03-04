@@ -10,4 +10,4 @@ test:
 	poetry run pytest
 
 test-ci:
-	poetry run pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src
+	poetry run pytest --junitxml=pytest.xml --cov-report=term-missing --cov=src | tee pytest-coverage.txt
