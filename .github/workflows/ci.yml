@@ -64,6 +64,7 @@ jobs:
         if: ${{ always() }}
         run: |
           make test-ci
+        shell: bash
       - name: Pytest coverage comment
         if: contains(github.event_name, 'pull_request')
         uses: MishaKav/pytest-coverage-comment@main
