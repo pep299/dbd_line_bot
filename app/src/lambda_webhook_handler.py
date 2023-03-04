@@ -3,6 +3,7 @@ import logging
 from typing import TypedDict
 
 import boto3
+import openai
 from linebot import LineBotApi, WebhookHandler, WebhookPayload
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import (
@@ -113,11 +114,30 @@ def message(text: str, reply_token: str, env: Env) -> None:
         if not output_list:
             return
 
-        messages = []
-        messages.append(TextSendMessage(text=output_list[0].full_text))
+        reply_line(output_list[0].full_text, reply_token, env)
 
-        line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
-        line_bot_api.reply_message(reply_token, messages=messages)
+    if (text_list := text.split())[0] == "/chatgpt":
+        if len(text_list) == 1:
+            return
+
+        openai.api_key = env.OPENAI_API_KEY
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "user", "content": text_list[1:]},
+            ],
+        )  # type: ignore
+
+        reply_line(response["choices"][0]["message"]["content"], reply_token, env)
+
+
+def reply_line(reply: str, reply_token: str, env: Env) -> None:
+    messages = []
+    messages.append(TextSendMessage(text=reply))
+
+    line_bot_api = LineBotApi(env.LINE_CHANNEL_ACCESS_TOKEN)
+    line_bot_api.reply_message(reply_token, messages=messages)
 
 
 def store_id(sender_id: str, env: Env) -> None:
