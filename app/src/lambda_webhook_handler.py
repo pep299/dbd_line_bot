@@ -125,7 +125,7 @@ def message(text: str, reply_token: str, env: Env) -> None:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "user", "content": text_list[1:]},
+                {"role": "user", "content": " ".join(text_list[1:])},
             ],
         )  # type: ignore
 
