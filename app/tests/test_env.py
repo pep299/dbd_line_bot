@@ -35,7 +35,7 @@ def test_get_env_prod(set_env: None) -> None:
     os.environ["ENV_NAME"] = "prod"
 
     ssm = boto3.client("ssm")
-    ssm.put_parameter(Name="LINE_CHANNEL_SECRET", Value="ssm_lcs")
+    ssm.put_parameter(Name="LINE_CHANNEL_SECRET")
     ssm.put_parameter(Name="LINE_CHANNEL_ACCESS_TOKEN", Value="ssm_lcat")
     ssm.put_parameter(Name="OPENAI_API_KEY", Value="ssm_oak")
     ssm.put_parameter(Name="TWITTER_BEARER_TOKEN", Value="ssm_tbt")
