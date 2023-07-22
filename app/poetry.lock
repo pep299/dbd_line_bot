@@ -839,20 +839,20 @@ files = [
 
 [[package]]
 name = "line-bot-sdk"
-version = "2.4.2"
+version = "2.4.3"
 description = "LINE Messaging API SDK for Python"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "line-bot-sdk-2.4.2.tar.gz", hash = "sha256:9655878c8df62fbeaf305dfa2d7a22ebe4a6340674e194b94e334bbe793bf1f5"},
-    {file = "line_bot_sdk-2.4.2-py2.py3-none-any.whl", hash = "sha256:6ccc48beb01a70b2504030b0d2c2764de95611d08d213f17c30060ac01c3f1a9"},
+    {file = "line-bot-sdk-2.4.3.tar.gz", hash = "sha256:5272b5172c93b11c8330ead5dc8939906d7ba912bb0627dffee80e6d26af106e"},
+    {file = "line_bot_sdk-2.4.3-py2.py3-none-any.whl", hash = "sha256:fec9775aa76791891f32ffbffe1f7ce8c209825b3695423221f7f08966580e4d"},
 ]
 
 [package.dependencies]
 aiohttp = "3.8.4"
 future = "*"
-requests = "2.28.2"
+requests = "2.31.0"
 
 [[package]]
 name = "markupsafe"
@@ -1452,21 +1452,21 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.28.2"
+version = "2.31.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
-python-versions = ">=3.7, <4"
+python-versions = ">=3.7"
 files = [
-    {file = "requests-2.28.2-py3-none-any.whl", hash = "sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa"},
-    {file = "requests-2.28.2.tar.gz", hash = "sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"},
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
+    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
 ]
 
 [package.dependencies]
 certifi = ">=2017.4.17"
 charset-normalizer = ">=2,<4"
 idna = ">=2.5,<4"
-urllib3 = ">=1.21.1,<1.27"
+urllib3 = ">=1.21.1,<3"
 
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
