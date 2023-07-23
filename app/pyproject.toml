@@ -6,7 +6,7 @@ authors = ["pep299"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-line-bot-sdk = "^2.2.1"
+line-bot-sdk = "^3.0.0"
 tweepy = "^4.9.0"
 boto3 = "^1.24.1"
 openai = "^0.27.0"
