@@ -202,43 +202,6 @@ exports[`snapshot test 1`] = `
       },
       "Type": "Custom::LogRetention",
     },
-    "DBDBotRuleAllowEventRuleMyTestStackBatchFunction266B4DA607C642BF": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "BatchFunction768110B6",
-            "Arn",
-          ],
-        },
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "DBDBotRuleEA0C7F1B",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "DBDBotRuleEA0C7F1B": {
-      "Properties": {
-        "ScheduleExpression": "cron(30 0,12 * * ? *)",
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "BatchFunction768110B6",
-                "Arn",
-              ],
-            },
-            "Id": "Target0",
-          },
-        ],
-      },
-      "Type": "AWS::Events::Rule",
-    },
     "DbdTopic54D06245": {
       "Type": "AWS::SNS::Topic",
     },

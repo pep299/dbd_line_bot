@@ -8,8 +8,6 @@ import {
   FunctionUrlAuthType,
 } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays, FilterPattern } from "aws-cdk-lib/aws-logs";
-import { Rule, Schedule } from "aws-cdk-lib/aws-events";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { Asset } from "aws-cdk-lib/aws-s3-assets";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
@@ -95,18 +93,6 @@ export class CdkStack extends Stack {
       role: iamRoleForLambda,
       timeout: Duration.minutes(5),
       logRetention: RetentionDays.TWO_MONTHS,
-    });
-
-    new Rule(this, "DBDBotRule", {
-      // cron: 毎日9:30, 21:30(JST) rule: 30 0,12 * * ? *
-      schedule: Schedule.cron({
-        minute: "30",
-        hour: "0,12",
-        day: "*",
-        month: "*",
-        year: "*",
-      }),
-      targets: [new LambdaFunction(batchStack)],
     });
 
     const lineIdBucket = Bucket.fromBucketName(
