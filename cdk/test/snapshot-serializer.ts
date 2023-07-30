@@ -3,7 +3,7 @@ module.exports = {
   print: (val: unknown) => {
     const newVal = (val as string).replace(
       /([A-Fa-f0-9]{64})(\.zip)/,
-      "[HASH REMOVED]"
+      "[HASH REMOVED]",
     );
     return `"${newVal}"`;
   },
