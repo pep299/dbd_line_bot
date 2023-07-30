@@ -28,7 +28,7 @@ export class CdkStack extends Stack {
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
-          "service-role/AWSLambdaBasicExecutionRole"
+          "service-role/AWSLambdaBasicExecutionRole",
         ),
         ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMReadOnlyAccess"),
       ],
@@ -36,11 +36,11 @@ export class CdkStack extends Stack {
 
     const s3BucketName = StringParameter.valueForStringParameter(
       this,
-      "S3_BUCKET_NAME"
+      "S3_BUCKET_NAME",
     );
     const s3KeyName = StringParameter.valueForStringParameter(
       this,
-      "S3_KEY_NAME"
+      "S3_KEY_NAME",
     );
 
     const lambdaEnv = {
@@ -70,7 +70,7 @@ export class CdkStack extends Stack {
     const webhookHandlerStack = new Function(this, "WebhookHandlerFunction", {
       code: Code.fromBucket(
         bundlingAssetLambdaCode.bucket,
-        bundlingAssetLambdaCode.s3ObjectKey
+        bundlingAssetLambdaCode.s3ObjectKey,
       ),
       runtime: Runtime.PYTHON_3_9,
       handler: "src/lambda_webhook_handler.lambda_handler",
@@ -87,7 +87,7 @@ export class CdkStack extends Stack {
     const batchStack = new Function(this, "BatchFunction", {
       code: Code.fromBucket(
         bundlingAssetLambdaCode.bucket,
-        bundlingAssetLambdaCode.s3ObjectKey
+        bundlingAssetLambdaCode.s3ObjectKey,
       ),
       runtime: Runtime.PYTHON_3_9,
       handler: "src/lambda_batch.lambda_handler",
@@ -112,14 +112,14 @@ export class CdkStack extends Stack {
     const lineIdBucket = Bucket.fromBucketName(
       this,
       s3BucketName,
-      s3BucketName
+      s3BucketName,
     );
     lineIdBucket.grantReadWrite(batchStack);
     lineIdBucket.grantReadWrite(webhookHandlerStack);
 
     const toNotification = StringParameter.valueForStringParameter(
       this,
-      "TO_NOTIFICATION"
+      "TO_NOTIFICATION",
     );
 
     const topic = new Topic(this, "DbdTopic");
@@ -131,7 +131,7 @@ export class CdkStack extends Stack {
         metricName: "[ERROR]WebhookHandler",
         metricNamespace: "LogMetrics",
         filterPattern: FilterPattern.literal("ERROR"),
-      }
+      },
     );
 
     const webhookAlarm = new Alarm(this, "ErrorWebhookHandlerAlarm", {
@@ -148,7 +148,7 @@ export class CdkStack extends Stack {
         metricName: "[ERROR]Batch",
         metricNamespace: "LogMetrics",
         filterPattern: FilterPattern.literal("ERROR"),
-      }
+      },
     );
 
     const batchAlarm = new Alarm(this, "ErrorBatchAlarm", {
